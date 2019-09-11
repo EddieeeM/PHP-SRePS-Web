@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="PHP-SRePS" />
+  <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+  <meta name="author" content="Rushi Patel" />
+  <title>Add Sales</title>
+</head>
+
+<body>
+
+  <h1>Add Sales Record</h1>
+
+  <form id="addSalesForm" action="/SalesRecordAdded" method="post">    <!-- TODO:Decide on a actoin page  -->
+
+    <fieldset>
+      <legend>Sales Information</legend>
+      <p><label for="itemID">Item ID:</label>
+        <select name="itemID" id="itemID">
+          <option value="">Please Select</option>   <!-- TODO: Where should the item list should be gatherd from? Database?  -->
+        </select>
+      </p>
+
+      <p><label for="salesDate">Sales Date:</label>
+        <input type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
+      </p>
+
+      <p><label for="itemQuantity">Quantity:</label>
+        <input type="number" name="itemQuantity" id="itemQuantity"/>
+      </p>
+    </fieldset>
+
+    <input type="submit" value="Submit" />
+    <input type="reset" value="Reset Form" />
+
+  </form>
+
+  <br />
+  <footer>
+    <p>SWE300010 - Development Project 2 - Design, Planning and Management</p>
+    <p>Pharmacy Sales Reporting and Prediction System</p>
+  </footer>
+
+</body>
+
+</html>
