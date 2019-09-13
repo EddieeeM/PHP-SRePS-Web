@@ -24,10 +24,32 @@ app.use(bodyParser.json())
 //where all of the static 'html' or 'ejs' data is stored
 const static_path = "/public/html/";
 
-//app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
 //creates the DB
 mysql.createDB();
+
+//essentially index for page
+app.get("/", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "index"));
+});
+
+app.get("/AddItemType", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "addItemType"));
+});
+
+app.post("/ItemTypeAdded", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + req.body.typeName + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: req.body.typeName});
+  }
+  });
+});
 
 app.get("/AddItem", async function(req, res)
 {
@@ -61,18 +83,15 @@ app.get("/AddSalesRecord", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
   await mysql.selectData("SELECT * FROM item").then(result => {
-    console.log(result);
 
     var options_string = "";
 
     result.forEach(function(element)
     {
-      console.log(element.item_Type);
       options_string += "<option value=" + element.Item_ID + ">" + element.Item_Name + "</option>";
     });
 
     res.render(path.join(__dirname + static_path + "addSales"), {options: HTMLParser.parse(options_string)});
-
   });
 });
 
