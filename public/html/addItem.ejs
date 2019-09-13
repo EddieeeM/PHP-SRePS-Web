@@ -7,13 +7,40 @@
   <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
   <meta name="author" content="Tim Keesman" />
   <title>Add Item</title>
+  <link href="styles/stylesheet.css" rel="stylesheet" />
+
+  <!-- Purpose: Add a new item to the stock -->
 </head>
 
 <body>
 
+  <div class="navbar">
+    <a href="index.ejs">Home</a>
+
+    <div class="dropdown">
+      <button class="dropbtn">Sales</button>
+      <div class="dropdown-content">
+        <a href="addSales.ejs">Add Sales</a>
+        <a href="manageSales.ejs">Manage Sales</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropbtn">Stock</button>
+      <div class="dropdown-content">
+        <a href="addItem.ejs">Add Item</a>
+        <a href="manageStock.ejs">Manage Stock</a>
+        <a href="viewStock.ejs">View Stock</a>
+      </div>
+    </div>
+
+    <a href="report.ejs">Report</a>
+    <a href="contact.ejs">Contact</a>
+  </div>
+
   <h1>Add Sales Record</h1>
 
-  <form id="addItemForm" action="/ItemAdded" method="post">    <!-- TODO:Decide on a actoin page  -->
+  <form id="addItemForm" action="/ItemAdded" method="post">
     <fieldset>
       <legend>Item Information</legend>
 
@@ -27,7 +54,7 @@
 
       <p><label for="itemType">Item Type:</label>
         <select name="itemType" id="itemType">
-          <%- options %>   <!-- TODO: Where should the item list should be gatherd from? Database?  -->
+          <%- options %>
         </select>
       </p>
     </fieldset>
