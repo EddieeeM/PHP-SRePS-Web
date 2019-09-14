@@ -10,19 +10,23 @@
 
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
+  <link href="styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
 
+  <div class="navbar" id="navbar">
+  </div>
+
   <h1>Add Sales Record</h1>
 
-  <form id="addSalesForm" action="/SalesRecordAdded" method="post">    <!-- TODO:Decide on a actoin page  -->
+  <form id="addSalesForm" action="/SalesRecordAdded" method="post">
 
     <fieldset>
       <legend>Sales Information</legend>
       <p><label for="itemID">Item ID:</label>
         <select name="itemID" id="itemID">
-          <%- options %>   <!-- TODO: Where should the item list should be gatherd from? Database?  -->
+          <%- options %>
         </select>
       </p>
 

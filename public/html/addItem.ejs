@@ -10,13 +10,17 @@
 
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
+  <link href="styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
 
+  <div class="navbar" id="navbar">
+  </div>
+
   <h1>Add Item</h1>
 
-  <form id="addItemForm" action="/ItemAdded" method="post">    <!-- TODO:Decide on a actoin page  -->
+  <form id="addItemForm" action="/ItemAdded" method="post">
     <fieldset>
       <legend>Item Information</legend>
 
@@ -30,7 +34,7 @@
 
       <p><label for="itemType">Item Type:</label>
         <select name="itemType" id="itemType">
-          <%- options %>   <!-- TODO: Where should the item list should be gatherd from? Database?  -->
+          <%- options %>
         </select>
       </p>
     </fieldset>
