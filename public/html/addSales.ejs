@@ -7,28 +7,35 @@
   <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
   <meta name="author" content="Rushi Patel" />
   <title>Add Sales</title>
+
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <link href="styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
 
+  <div class="navbar" id="navbar">
+  </div>
+
   <h1>Add Sales Record</h1>
 
-  <form id="addSalesForm" action="/SalesRecordAdded" method="post">    <!-- TODO:Decide on a actoin page  -->
+  <form id="addSalesForm" action="/SalesRecordAdded" method="post">
 
     <fieldset>
       <legend>Sales Information</legend>
       <p><label for="itemID">Item ID:</label>
         <select name="itemID" id="itemID">
-          <%- options %>   <!-- TODO: Where should the item list should be gatherd from? Database?  -->
+          <%- options %>
         </select>
       </p>
 
       <p><label for="salesDate">Sales Date:</label>
-        <input type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
+        <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
       </p>
 
       <p><label for="itemQuantity">Quantity:</label>
-        <input type="number" name="itemQuantity" id="itemQuantity"/>
+        <input required="required" type="number" name="itemQuantity" id="itemQuantity"/>
       </p>
     </fieldset>
 
@@ -38,10 +45,8 @@
   </form>
 
   <br />
-  <footer>
-    <p>SWE300010 - Development Project 2 - Design, Planning and Management</p>
-    <p>Pharmacy Sales Reporting and Prediction System</p>
-  </footer>
+  <div id="footer">
+  </div>
 
 </body>
 

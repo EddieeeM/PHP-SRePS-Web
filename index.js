@@ -24,10 +24,32 @@ app.use(bodyParser.json())
 //where all of the static 'html' or 'ejs' data is stored
 const static_path = "/public/html/";
 
-//app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
 //creates the DB
 mysql.createDB();
+
+//essentially index for page
+app.get("/", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "index"));
+});
+
+app.get("/AddItemType", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "addItemType"));
+});
+
+app.post("/ItemTypeAdded", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + req.body.typeName + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: req.body.typeName});
+  }
+  });
+});
 
 app.get("/AddItem", async function(req, res)
 {
@@ -61,18 +83,15 @@ app.get("/AddSalesRecord", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
   await mysql.selectData("SELECT * FROM item").then(result => {
-    console.log(result);
 
     var options_string = "";
 
     result.forEach(function(element)
     {
-      console.log(element.item_Type);
       options_string += "<option value=" + element.Item_ID + ">" + element.Item_Name + "</option>";
     });
 
     res.render(path.join(__dirname + static_path + "addSales"), {options: HTMLParser.parse(options_string)});
-
   });
 });
 
@@ -87,4 +106,55 @@ app.post("/SalesRecordAdded", async function(req, res)
 const server = http.createServer(app);
 server.listen(process.env.PORT || '3001', function () {
   console.log('Server app listening on port 3001!');
+});
+
+app.get("/SearchSalesRecord", async function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "searchSalesRecord"));
+});
+
+app.post("/ReturnSalesRecord", async function(req, res)
+{
+  var search_string = req.body.searchString;
+  var search_date = req.body.searchDate;
+  var start_date = req.body.startDate;
+  var end_date = req.body.endDate;
+
+  console.log(start_date);
+
+  if (search_date == "true")
+  {
+    //waits for the response for database, then continues, utilizing the response string
+    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + search_string + "%' OR item_types.item_Type LIKE '%" + search_string + "%' AND sales.Sale_Date >= " + start_date + " AND sales.Sale_Date <= " + end_date).then(result => {
+
+      var output_string = "";
+
+      result.forEach(function(element)
+      {
+        output_string += "<p>Sale Number: " + element.Sale_ID + " | Quantity: " + element.Quantity + " Item: " + element.Item_Name + "</p>";
+      });
+
+      if (output_string.length == 0)
+      {
+        output_string = "<p>No Results Found</p>";
+      }
+
+      res.render(path.join(__dirname + static_path + "returnSalesRecord"), {data: HTMLParser.parse(output_string)});
+    });
+  }
+  else
+  {
+    //waits for the response for database, then continues, utilizing the response string
+    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + search_string + "%' OR item_types.item_Type LIKE '%" + search_string + "%'").then(result => {
+
+      var output_string = "";
+
+      result.forEach(function(element)
+      {
+        output_string += "<p>Sale Number: " + element.Sale_ID + " | Quantity: " + element.Quantity + " Item: " + element.Item_Name + "</p>";
+      });
+
+      res.render(path.join(__dirname + static_path + "returnSalesRecord"), {data: HTMLParser.parse(output_string)});
+    });
+  }
 });

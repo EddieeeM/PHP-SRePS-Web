@@ -47,37 +47,6 @@ exports.createDB = function(){
   con.end();
 }
 
-//SQL INSERT COMMANDS
-exports.insertData = function(sql_command)
-{
-  con = mysql.createConnection(config);
-  con.connect(function(err)
-  {
-    if (err)
-    {
-      console.log(err);
-      con.end();
-      throw err;
-    }});
-
-     console.log ("Connected to Database");
-
-     //Queries db, waits for a response from the DB then returns the output
-     var query_output = con.query(query, function (err, result)
-     {
-      if (err)
-      {
-        console.log(err);
-        con.end();
-        throw err;
-      }
-
-      console.log("Insert Data successfully");
-     });
-
-  con.end();
-}
-
 //SQL SELECT DATA
 exports.selectData = async function(sql_command)
 {
@@ -108,10 +77,13 @@ exports.insertData = async function(sql_command)
       console.log(err);
       con.end();
       throw err;
-    }});
+      return false;
+    }
+  });
 
     //Queries db, waits for a response from the DB then returns the output
     var output = await sql_wait_for_result(con, sql_command);
+
     con.end();
 
     if (output)
@@ -127,18 +99,20 @@ function sql_wait_for_result(con, query)
 {
   return new Promise((res, rej) =>
   {
-      con.query(query, function(err, result)
+    con.query(query, function(err, result)
+    {
+      if (err)
       {
-        if (err)
-        {
-          console.log(err);
-          con.end();
-          throw err;
-        }
+        console.log(err);
+        con.end();
+        throw err;
+        return false;
+      }
 
-        res(result);
-        return result;
+      res(result);
+      return result;
 
-      });
     });
+  });
+
 }
