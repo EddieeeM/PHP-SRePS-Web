@@ -68,6 +68,13 @@ app.get("/AddItem", async function(req, res)
   });
 });
 
+app.get("/DeleteItem", async function(req, res)
+{
+  
+    res.render(path.join(__dirname + static_path + "deleteItem"));
+ 
+});
+
 app.post("/ItemAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
@@ -75,6 +82,17 @@ app.post("/ItemAdded", async function(req, res)
   if (result)
   {
     res.render(path.join(__dirname + static_path + "itemAdded"), {name: req.body.itemName});
+  }
+  });
+});
+
+app.post("/ItemDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM item WHERE Item_Name =  ('" + req.body.itemName + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName});
   }
   });
 });
