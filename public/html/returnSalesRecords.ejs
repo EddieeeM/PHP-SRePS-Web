@@ -9,7 +9,7 @@
 
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script src="/js/loadhtml.js"></script>
-    <link href="styles/stylesheet.css" rel="stylesheet" />
+    <link href="/html/styles/stylesheet.css" rel="stylesheet" />
   </head>
 
   <body>
@@ -17,7 +17,18 @@
     </div>
 
     <h1>Return Sales Data</h1>
-    <div><%- data %></div>
+
+    <table>
+      <tr>
+        <th>Sales ID</th>
+        <th>Quantity</th>
+        <th>Item ID</th>
+        <th>Item Name</th>
+        <th>Sale Date</th>
+      </tr>
+
+      <%- data %>
+    </table>
 
     <div id="footer">
     </div>

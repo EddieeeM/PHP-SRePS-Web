@@ -7,6 +7,7 @@ var config = {
     host: "localhost",
     user: "root",
     password: "",
+    port: 3306,
     database: "peoplehealth"
 };
 
@@ -20,9 +21,8 @@ exports.createDB = function(){
       console.log(err);
       con.end();
       throw err;
+      return false;
     }});
-
-     console.log ("Connected to Database");
 
      //Queries
      var ItemTypes = "CREATE TABLE IF NOT EXISTS Item_Types (itmType_ID INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY, item_Type VARCHAR(20) NOT NULL);";
@@ -39,10 +39,14 @@ exports.createDB = function(){
         console.log(err);
         con.end();
         throw err;
+        return false;
       }
 
       console.log("Created new Tables");
+      return true;
      });
+
+   return query_output;
 
   con.end();
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="PHP-SRePS" />
+  <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+  <meta name="author" content="Tim Keesman" />
+  <title>Generate Sales Report</title>
+
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+
+  <script>
+    function displayRangeRange()
+    {
+      if ($("#extended_range").is(":hidden"))
+      {
+        $("#extended_range").show();
+      }
+      else
+      {
+        $("#extended_range").hide();
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div class="navbar" id="navbar">
+  </div>
+  <h1>Generate Sales Records</h1>
+
+  <form id="generateSalesForm" action="/DisplaySalesReport" method="get">    <!-- TODO:Decide on a actoin page  -->
+
+    <fieldset>
+      <legend>Sales Information</legend>
+
+      <strong>
+      <p>Date Range:</p>
+      </strong>
+
+      <p><label for="startDate">Month/Year:</label>
+        <input type="month" required name="startDate" id="startDate"/>
+      </p>
+
+      <button type="button" name="button" onclick="displayRangeRange()">Choose Date Range</button>
+
+      <p id="extended_range" hidden><label for="endDate">End Month/Year:</label>
+        <input type="month" name="endDate" id="endDate"/>
+      </p>
+
+      <br/>
+
+      <input type="submit" value="Submit" />
+      <input type="reset" value="Reset Form" />
+  </fieldset>
+
+  </form>
+
+  <br />
+  <div id="footer">
+  </div>
+
+</body>
+
+</html>
