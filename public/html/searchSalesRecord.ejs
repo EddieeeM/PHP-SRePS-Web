@@ -10,7 +10,7 @@
 
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
-  <link href="styles/stylesheet.css" rel="stylesheet" />
+  <link href="/html/styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -18,7 +18,7 @@
   </div>
   <h1>Search Sales Records</h1>
 
-  <form id="searchSalesForm" action="/ReturnSalesRecord" method="post">    <!-- TODO:Decide on a actoin page  -->
+  <form id="searchSalesForm" action="/ReturnSalesRecords" method="post">    <!-- TODO:Decide on a actoin page  -->
 
     <fieldset>
       <legend>Sales Information</legend>
@@ -34,7 +34,7 @@
         <input type="date" name="startDate" id="startDate"/>
       </p>
 
-      <p><label for="endDate">Start Date:</label>
+      <p><label for="endDate">End Date:</label>
         <input type="date" name="endDate" id="endDate"/>
       </p>
 

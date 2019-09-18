@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="PHP-SRePS" />
+    <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+    <meta name="author" content="Timothy Keesman" />
+    <title>Return Sales Data</title>
+
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/loadhtml.js"></script>
+    <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+
+    <script>
+    $( document ).ready(function()
+    {
+      var url = window.location.href;
+      var get_vars = url.split("?")[1];
+      get_vars = url.split("&")
+
+      $("#downloadCSV").html("<a href='localhost:3001/DownloadCSV?startDate=" + get_vars[0].split("=")[1] + "&endDate=" + get_vars[1].split("=")[1] + "'>Download CSV Report</a>");
+    });
+    </script>
+  </head>
+
+  <body>
+    <div class="navbar" id="navbar">
+    </div>
+
+    <h1>Sales Report</h1>
+
+    <p id="downloadCSV"></p>
+
+    <table>
+      <tr>
+        <th>Sales ID</th>
+        <th>Quantity</th>
+        <th>Item ID</th>
+        <th>Item Name</th>
+        <th>Sale Date</th>
+      </tr>
+
+      <%- data %>
+    </table>
+
+    <div id="footer">
+    </div>
+  </body>
+</html>
