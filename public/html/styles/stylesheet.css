@@ -73,3 +73,99 @@ body {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+
+
+/* ----------------------------------------------- */
+/* Only applies to MANAGE SALES, VIEW SALES RECORDS*/
+/* PLEASE LEAVE THESE MARKERS  */
+
+/* Align text in main information area */
+.span-info-box {
+  text-align: center;  
+}
+
+/* Allows each span in the manage sales area to take up 1/3rd of the screen */
+.span-third {  
+  width:33%;
+  display:inline-block;
+  text-align: center;
+}
+
+/* Button styling - Links / Visited Links */
+.sales-management-button:link, .sales-management-button:visited {
+  background-color: white;
+  color: black;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border: solid;
+  border-color: black;
+}
+
+/* Button styling - Hover / Active */
+.sales-management-button:hover, .sales-management-button:active {
+  background-color: grey;
+}
+
+/* Sections of text in squares*/
+.content-section {
+  background: #FAFAFA;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  border-color: #263037; 
+}
+
+/* Sections of text in squares*/
+.article-content {
+  margin-top: 5px;
+  white-space: pre-line;
+}
+
+/* Sections of text in squares*/
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Header colouring */
+th {
+  background: #36454F;
+  color: white;
+}
+
+/* Border / Colouring for general table */
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+/* Zebra stripes */
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+/* Zebra stripes */
+tr:nth-child(odd) {
+  background-color: #d3d3d3 ;
+}
+
+/* Hover white over current row */
+tr:hover {
+  background-color: white;
+} 
+
+/* End of MANAGE SALES, VIEW SALES RECORDS CSS */
+/* PLEASE LEAVE THESE MARKERS  */
+/* ------------------------------------------- */
