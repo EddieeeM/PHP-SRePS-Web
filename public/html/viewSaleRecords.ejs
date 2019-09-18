@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Sales Manager</title>
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+
+  <!-- All CSS for this webpage can be found in a section in the stylesheet -->
+  <link href="html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+
+<body>
+	<!-- Include Header element -->
+  <div class="navbar" id="navbar"></div>
+  <br />
+
+  <!-- Table to display Sales Record Data -->
+  <table class="table table-hover table-bordered">
+
+    <!-- Hard coded table headers -->
+    <thead>
+      <tr>
+        <th scope="col">Sale ID</th>
+        <th scope="col">Item ID</th>
+        <th scope="col">Sale Date</th>
+        <th scope="col">Quantity</th>
+      </tr>
+    </thead>
+
+    <!-- Table body -->
+    <tbody>
+
+    <!-- If there is table data - print it out -->
+    <% if(SalesData.length) { 
+      <!-- Create table entry for each observation -->
+      for(var i = 0; i < SalesData.length;i++) 
+      { %>
+        <tr>
+          <td><%= SalesData[i].Sale_ID %></td>
+          <td><%= SalesData[i].Item_ID %></td>
+          <td><%= SalesData[i].Sale_Date %></td>
+          <td><%= SalesData[i].Quantity %></td>
+        </tr>
+    <% }
+    }
+    <!-- Else there is no table data -->
+    else { %>
+      <tr>
+      	<!-- Alert the user -->
+        <td colspan="4">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
+      </tr>
+    <% } 
+    %>
+    </tbody>
+  </table>
+
+  <!-- Include Footer element -->
+  <br />
+  <div id="footer"> </div>
+</body>
+</html>

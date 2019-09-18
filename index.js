@@ -158,3 +158,29 @@ app.post("/ReturnSalesRecord", async function(req, res)
     });
   }
 });
+
+
+
+// -----------------------------------------------------------------------------------------
+// -- Added by Alexander
+// -----------------------------------------------------------------------------------------
+
+// Manage Sales landing page
+app.get("/ManageSales", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageSales"));
+});
+
+// View Records page
+app.get("/ViewSaleRecords", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM sales").then(result => {
+    
+    // Render view and pass result of query to be displayed 
+    res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
+  });
+});
+
+// -----------------------------------------------------------------------------------------
