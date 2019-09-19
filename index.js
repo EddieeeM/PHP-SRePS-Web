@@ -29,6 +29,9 @@ app.use(express.static(__dirname + '/public'));
 //creates the DB
 mysql.createDB();
 
+//creates Tables
+mysql.createTables();
+
 //essentially index for page
 app.get("/", function(req, res)
 {
