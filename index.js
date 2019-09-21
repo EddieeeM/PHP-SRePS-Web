@@ -124,6 +124,22 @@ app.post("/SalesRecordAdded", async function(req, res)
   });
 });
 
+app.get("/DeleteSalesRecord", async function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "deleteSales"));
+});
+
+app.post("/SalesRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.salesID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "salesRecordDeleted"));
+  }
+  });
+});
+
 const server = http.createServer(app);
 server.listen(process.env.PORT || '3001', function () {
   console.log('Server app listening on port 3001!');
