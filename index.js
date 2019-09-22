@@ -57,7 +57,7 @@ app.post("/ItemTypeAdded", async function(req, res)
 app.get("/AddItem", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.selectData("SELECT * FROM item_types").then(result => {
+  await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result => {
 
     var options_string = "";
 
@@ -85,7 +85,7 @@ app.post("/ItemAdded", async function(req, res)
 app.get("/AddSalesRecord", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.selectData("SELECT * FROM item").then(result => {
+  await mysql.selectData("SELECT * FROM item ORDER BY item.Item_Name").then(result => {
 
     var options_string = "";
 
@@ -317,8 +317,112 @@ app.get("/DisplaySalesReport", async function(req, res)
   res.render(path.join(__dirname + static_path + "displaySalesReport"), {data: HTMLParser.parse(output_string)});
 });
 
+app.get("/ManageItems", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageItems"));
+});
 
+app.get("/ManageItemTypes", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageItemTypes"));
+});
 
+// View Items page
+app.get("/ViewItemRecords", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "ViewItemRecords"), {ItemData: result});
+  });
+});
+
+app.get("/ViewItemTypeRecords", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM item_types").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "ViewItemTypeRecords"), {ItemData: result});
+  });
+});
+
+app.get("/Contact", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "contact"));
+});
+
+//Edit Item Page
+app.get("/EditItem", async function(req, res)
+{
+  var itemID = req.query.itemID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result =>
+    {
+      var options_string = "";
+
+      result.forEach(function(element)
+      {
+        options_string += "<option value=" + element.itmType_ID + ">" + element.item_Type + "</option>";
+      });
+
+      mysql.selectData("SELECT * FROM item WHERE Item_ID = '" + itemID + "'").then(itemResult =>
+      {
+        var item_obj;
+        itemResult.forEach(function(element)
+        {
+          item_obj = element;
+          //renders ejs doc as html, replace document variables with options for the select field
+        });
+
+        res.render(path.join(__dirname + static_path + "editItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
+        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
+      });
+    });
+});
+
+app.post("/ItemEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE item SET Item_Name = '" + req.body.itemName + "', Price = '" + req.body.itemPrice +
+    "', itmType_ID = '" + req.body.itemType + "' WHERE Item_ID = '" + req.body.itemID + "'").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "ItemEdited"), {name: req.body.itemName});
+  }
+  });
+});
+
+app.get("/EditItemType", async function(req, res)
+{
+  var itemTypeID = req.query.itemTypeID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM item_types WHERE itmType_ID = '" + itemTypeID + "'").then(result =>
+    {
+        var itemType_obj;
+
+        result.forEach(function(element)
+        {
+          itemType_obj = element;
+        });
+
+        res.render(path.join(__dirname + static_path + "editItemType"), {itemTypeID: "value = '" + itemTypeID + "'", itemTypeName: "value = '" + itemType_obj.item_Type + "'"});
+      });
+});
+
+app.post("/ItemTypeEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE item_types SET item_Type = '" + req.body.typeName + "' WHERE itmType_ID = '" + req.body.itemTypeID  + "'").then(result => {
+    if (result)
+    {
+      res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: req.body.typeName});
+    }
+  });
+});
 // -----------------------------------------------------------------------------------------
 // -- Added by Alexander
 // -----------------------------------------------------------------------------------------
@@ -335,8 +439,8 @@ app.get("/ViewSaleRecords", async function(req, res)
   // Querey database and wait for result response
   // Returns ALL sales records and passes in array
   await mysql.selectData("SELECT * FROM sales").then(result => {
-    
-    // Render view and pass result of query to be displayed 
+
+    // Render view and pass result of query to be displayed
     res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
   });
 });
