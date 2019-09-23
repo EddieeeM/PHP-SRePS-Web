@@ -20,19 +20,18 @@
 
   <h1>Delete Sales Record</h1>
 
-  <form id="deleteSalesForm" action="/SalesRecordDeleted" method="post">
+  <form id="deleteSalesForm" action="/SalesRecordDeleted" method="get">
+    <input hidden="hidden" type="text" id="saleID" name="saleID" <%- saleIDValue %> />
 
     <fieldset>
       <legend>Sales Information</legend>
-      <p><label for="salesID">Sales ID:</label>
-        <input required="required" type="text" name="salesID" id="salesID"/>
-      </p>
+      <p>Sale ID: <%= saleID %></p>
+      <p>Sale Date: <%= saleDate %></p>
+      <p>Item: <%= itemName %></p>
 
-      
     </fieldset>
 
-    <input type="submit" value="Submit" />
-    <input type="reset" value="Reset Form" />
+    <input type="submit" value="Delete" />
 
   </form>
 

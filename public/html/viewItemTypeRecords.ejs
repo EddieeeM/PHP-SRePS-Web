@@ -14,7 +14,7 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <br />
+  <h1>Item Types</h1>
 
   <!-- Table to display Sales Record Data -->
   <table class="table table-hover table-bordered">
@@ -41,7 +41,7 @@
           <td><%= ItemData[i].itmType_ID %></td>
           <td><%= ItemData[i].item_Type %></td>
           <td><a href='/EditItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Edit Item Type</a></td>
-          <td><a href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>          
+          <td><a href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>
         </tr>
     <% }
     }

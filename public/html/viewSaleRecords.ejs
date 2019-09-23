@@ -14,7 +14,7 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <br />
+  <h1>Sales Records</h1>
 
   <!-- Table to display Sales Record Data -->
   <table class="table table-hover table-bordered">
@@ -26,6 +26,8 @@
         <th scope="col">Item ID</th>
         <th scope="col">Sale Date</th>
         <th scope="col">Quantity</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
       </tr>
     </thead>
 
@@ -42,6 +44,8 @@
           <td><%= SalesData[i].Item_ID %></td>
           <td><%= SalesData[i].Sale_Date %></td>
           <td><%= SalesData[i].Quantity %></td>
+          <td></td>
+          <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
         </tr>
     <% }
     }

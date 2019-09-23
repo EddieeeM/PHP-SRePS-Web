@@ -106,22 +106,6 @@ app.post("/SalesRecordAdded", async function(req, res)
   });
 });
 
-app.get("/DeleteSalesRecord", async function(req, res)
-{
-  res.render(path.join(__dirname + static_path + "deleteSales"));
-});
-
-app.post("/SalesRecordDeleted", async function(req, res)
-{
-  //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.salesID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "salesRecordDeleted"));
-  }
-  });
-});
-
 app.get("/SearchSalesRecord", async function(req, res)
 {
   res.render(path.join(__dirname + static_path + "searchSalesRecord"));
@@ -364,6 +348,35 @@ app.get("/ViewItemTypeRecords", async function(req, res)
 app.get("/Contact", function(req, res)
 {
   res.render(path.join(__dirname + static_path + "contact"));
+});
+
+app.get("/DeleteSalesRecord", async function(req, res)
+{
+  var saleID = req.query.saleID;
+
+  mysql.selectData("SELECT * FROM sales JOIN item ON sales.Item_ID = item.Item_ID WHERE Sale_ID = '" + saleID +
+  "'").then(itemResult =>
+  {
+    var sale_obj;
+    itemResult.forEach(function(element)
+    {
+      sale_obj = element;
+      //renders ejs doc as html, replace document variables with options for the select field
+    });
+
+    res.render(path.join(__dirname + static_path + "deleteSales"), {saleIDValue: "value = '" + sale_obj.Sale_ID + "'", saleID: sale_obj.Sale_ID, saleDate: sale_obj.Sale_Date, itemName: sale_obj.Item_Name});
+  });
+});
+
+app.get("/SalesRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.query.saleID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.query.saleID});
+  }
+  });
 });
 
 app.get("/DeleteItem", async function(req, res)
