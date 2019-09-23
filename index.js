@@ -71,6 +71,13 @@ app.get("/AddItem", async function(req, res)
   });
 });
 
+app.get("/DeleteItem", async function(req, res)
+{
+  
+    res.render(path.join(__dirname + static_path + "deleteItem"));
+ 
+});
+
 app.post("/ItemAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
@@ -78,6 +85,17 @@ app.post("/ItemAdded", async function(req, res)
   if (result)
   {
     res.render(path.join(__dirname + static_path + "itemAdded"), {name: req.body.itemName});
+  }
+  });
+});
+
+app.post("/ItemDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM item WHERE Item_Name =  ('" + req.body.itemName + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName});
   }
   });
 });
@@ -103,6 +121,22 @@ app.post("/SalesRecordAdded", async function(req, res)
   //waits for the response for database, then continues, utilizing the response string
   await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "'," + req.body.salesDate + "," + req.body.itemQuantity + ");").then(result => {
   res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
+  });
+});
+
+app.get("/DeleteSalesRecord", async function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "deleteSales"));
+});
+
+app.post("/SalesRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.salesID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "salesRecordDeleted"));
+  }
   });
 });
 
