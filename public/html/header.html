@@ -3,6 +3,7 @@
 <div class="dropdown">
   <button class="dropbtn">Sales</button>
   <div class="dropdown-content">
+    <a href="/ManageSales">Manage Sales</a>
     <a href="/AddSalesRecord">Add Sales</a>
     <a href="/DeleteSalesRecord">Delete Sales</a>
     <a href="/manageSales">Manage Sales</a>
@@ -10,15 +11,31 @@
 </div>
 
 <div class="dropdown">
-  <button class="dropbtn">Stock</button>
+  <button class="dropbtn">Items</button>
   <div class="dropdown-content">
+    <a href="/ManageItems">Manage Items</a>
     <a href="/AddItem">Add Item</a>
     <a href="/AddItemType">Add Item Type</a>
+  </div>
+</div>
+
+<!--
+<div class="dropdown">
+  <button class="dropbtn">Stock</button>
+  <div class="dropdown-content">
     <a href="/DeleteItem">Delete Item</a>
     <a href="manageStock.ejs">Manage Stock</a>
     <a href="viewStock.ejs">View Stock</a>
   </div>
 </div>
+-->
 
-<a href="report.ejs">Report</a>
-<a href="contact.ejs">Contact</a>
+<div class="dropdown">
+  <button class="dropbtn">Report</button>
+  <div class="dropdown-content">
+    <a href="/GenerateSalesReport">Generate Report</a>
+  </div>
+</div>
+
+
+<a href="/Contact">Contact</a>

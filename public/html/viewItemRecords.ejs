@@ -22,10 +22,11 @@
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Sale ID</th>
         <th scope="col">Item ID</th>
-        <th scope="col">Sale Date</th>
-        <th scope="col">Quantity</th>
+        <th scope="col">Item Name</th>
+        <th scope="col">Item Price</th>
+        <th scope="col">Item Type</th>
+        <th scope="col">Edit</th>
       </tr>
     </thead>
 
@@ -33,15 +34,16 @@
     <tbody>
 
     <!-- If there is table data - print it out -->
-    <% if(SalesData.length) {
+    <% if(ItemData.length) {
       <!-- Create table entry for each observation -->
-      for(var i = 0; i < SalesData.length;i++)
+      for(var i = 0; i < ItemData.length;i++)
       { %>
         <tr>
-          <td><%= SalesData[i].Sale_ID %></td>
-          <td><%= SalesData[i].Item_ID %></td>
-          <td><%= SalesData[i].Sale_Date %></td>
-          <td><%= SalesData[i].Quantity %></td>
+          <td><%= ItemData[i].Item_ID %></td>
+          <td><%= ItemData[i].Item_Name %></td>
+          <td>$ <%= ItemData[i].Price %></td>
+          <td><%= ItemData[i].item_Type %></td>
+          <td><a href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
         </tr>
     <% }
     }
@@ -49,7 +51,7 @@
     else { %>
       <tr>
       	<!-- Alert the user -->
-        <td colspan="4">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
+        <td colspan="4">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>
