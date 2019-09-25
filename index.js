@@ -112,7 +112,7 @@ app.get("/AddSalesRecord", async function(req, res)
 app.post("/SalesRecordAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "','" + req.body.salesDate + "'," + req.body.itemQuantity + ");").then(result => {
+  await mysql.insertData("INSERT INTO sales (Sale_ID, Sale_Date, Quantity) VALUES ('" + req.body.sale_ID + "','" + req.body.salesDate + "'," + req.body.itemQuantity + ");").then(result => {
   res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
   });
 });
@@ -568,6 +568,49 @@ app.get("/ViewSaleRecords", async function(req, res)
 
 // -----------------------------------------------------------------------------------------
 
+app.get("/EditSalesRecord", async function(req, res)
+{
+  var saleID = req.query.saleID;
+ 
+  await mysql.selectData("SELECT * FROM sales ORDER BY sales.Sale_ID").then(result =>
+    {
+      var options_string = "";
+ 
+      result.forEach(function(element)
+      {
+        options_string += "<option value=" + element.saleID + ">" + element.saleDate + "</option>";
+      });
+ 
+      mysql.selectData("SELECT * FROM sales WHERE Sale_ID = '" + saleID + "'").then(saleResult =>
+      {
+        var sale_obj;
+        saleResult.forEach(function(element)
+        {
+          sale_obj = element;
+          //renders ejs doc as html, replace document variables with options for the select field
+        });
+ 
+         res.render(path.join(__dirname + static_path + "editSales"), {options: HTMLParser.parse(options_string), saleID: "value = '" + sale_obj.salesID + "'",
+         salesDate: "value = '" + sale_obj.salesDate + "'"});
+       });
+ 
+ 
+      res.render(path.join(__dirname + static_path + "editSales"));
+ 
+    });
+});
+
+app.post("/SalesEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE sales SET Sale_ID = '" + req.body.saleID + "', Date = '" + req.body.salesDate +
+    "', Quantity = '" + req.body.itemQuantity + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "SalesEdited"), {name: req.body.saleID});
+  }
+  });
+});
 
 const server = http.createServer(app);
 server.listen(process.env.PORT || '3001', function () {

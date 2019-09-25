@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="PHP-SRePS" />
+  <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+  <meta name="author" content="Eddie Monserrate" />
+  <title>Edit Sales</title>
+ 
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+ 
+<body>
+ 
+  <div class="navbar" id="navbar">
+  </div>
+ 
+ 
+  <h1>Sale Edited</h1>
+ 
+  <form id="addSalesForm" action="/salesEdited" method="post">   
+    <input required="required" type="text" name="saleID" hidden="hidden" id="saleID" <%- saleID %> />
+ 
+    <fieldset>
+      <legend>Sale Information</legend>
+      <p><label for="editDate">Sale Date:</label>
+        <input required="required" type="Date" value="YYYY-MM-DD" name="salesDate" id="salesDate" <%- saleDate %> />
+      </p>
+
+      <p><label for="itemQuantity">Sale Quantity:</label>
+        <input required="required" type="number" name="itemQuantity" id="itemQuantity" <%- itemQuantity %> />
+      </p>
+    </fieldset>
+ 
+    <input type="submit" value="Submit" />
+    <input type="reset" value="Reset Form" />
+ 
+  </form>
+ 
+  <br />
+ 
+  <div id="footer">
+  </div>
+ 
+</body>
+ 
+</html>

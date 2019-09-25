@@ -78,7 +78,8 @@ exports.createTables = function(){
     //Queries
     var ItemTypes = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Item_Types (itmType_ID INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY, item_Type VARCHAR(20) NOT NULL);";
     var ItemTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Item (Item_ID INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_Name VARCHAR(20) NOT NULL, Price FLOAT(6) UNSIGNED NOT NULL, itmType_ID INT(8) UNSIGNED NOT NULL, FOREIGN KEY (itmType_ID) REFERENCES Item_Types(itmType_ID));";
-    var SalesTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Sales (Sale_ID INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_ID INT(6) UNSIGNED NOT NULL, Sale_Date DATE, Quantity INT(3), FOREIGN KEY (Item_ID) REFERENCES Item(Item_ID));";
+    var SalesTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Sales (Sale_ID INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Sale_Date DATE, Quantity INT(3));";
+    var SalesItems = "USE peoplehealth;  CREATE TABLE IF NOT EXISTS Sales_Items (Sale_ID INT (10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_ID INT(6) UNSIGNED NOT NULL, Quantity INT(3), FOREIGN KEY (Item_ID) REFERENCES Item(Item_ID));"
 
     //Runs all the create Table Queries
     async.parallel([
@@ -101,8 +102,16 @@ exports.createTables = function(){
       function(parallel_complete){
         con.query(SalesTable, {}, function(err, results) 
         {
+        if (err) return parallel_complete (err);
+          console.log("Created Sales Table successfully");
+          return results;
+        });
+      },
+      function(parallel_complete){
+        con.query(SalesItems, {}, function(err, results) 
+        {
           if (err) return parallel_complete (err);
-            console.log("Created Item Sales Table successfully");
+            console.log("Created Sales Items Table successfully");
             return results;
         });
       }
