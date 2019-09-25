@@ -71,8 +71,6 @@ app.get("/AddItem", async function(req, res)
   });
 });
 
-
-
 app.post("/ItemAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
@@ -114,30 +112,9 @@ app.get("/AddSalesRecord", async function(req, res)
 app.post("/SalesRecordAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "'," + req.body.salesDate + "," + req.body.itemQuantity + ");").then(result => {
+  await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "','" + req.body.salesDate + "'," + req.body.itemQuantity + ");").then(result => {
   res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
   });
-});
-
-app.get("/DeleteSalesRecord", async function(req, res)
-{
-  res.render(path.join(__dirname + static_path + "deleteSales"));
-});
-
-app.post("/SalesRecordDeleted", async function(req, res)
-{
-  //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.salesID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "salesRecordDeleted"));
-  }
-  });
-});
-
-const server = http.createServer(app);
-server.listen(process.env.PORT || '3001', function () {
-  console.log('Server app listening on port 3001!');
 });
 
 app.get("/SearchSalesRecord", async function(req, res)
@@ -384,6 +361,93 @@ app.get("/Contact", function(req, res)
   res.render(path.join(__dirname + static_path + "contact"));
 });
 
+app.get("/DeleteSalesRecord", async function(req, res)
+{
+  var saleID = req.query.saleID;
+
+  mysql.selectData("SELECT * FROM sales JOIN item ON sales.Item_ID = item.Item_ID WHERE Sale_ID = '" + saleID +
+  "'").then(itemResult =>
+  {
+    var sale_obj;
+    itemResult.forEach(function(element)
+    {
+      sale_obj = element;
+      //renders ejs doc as html, replace document variables with options for the select field
+    });
+
+    res.render(path.join(__dirname + static_path + "deleteSales"), {saleIDValue: "value = '" + sale_obj.Sale_ID + "'", saleID: sale_obj.Sale_ID, saleDate: sale_obj.Sale_Date, itemName: sale_obj.Item_Name});
+  });
+});
+
+app.get("/SalesRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.query.saleID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.query.saleID});
+  }
+  });
+});
+
+app.get("/DeleteItem", async function(req, res)
+{
+    var itemID = req.query.itemID;
+
+    mysql.selectData("SELECT * FROM item WHERE Item_ID = '" + itemID + "'").then(itemResult =>
+    {
+      var item_obj;
+      itemResult.forEach(function(element)
+      {
+        item_obj = element;
+        //renders ejs doc as html, replace document variables with options for the select field
+      });
+
+      res.render(path.join(__dirname + static_path + "deleteItem"), {itemID: "value = '" + item_obj.Item_ID + "'",
+      itemName: item_obj.Item_Name});
+    });
+});
+
+app.get("/ItemDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.query.itemID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.query.itemID});
+  }
+  });
+});
+
+app.get("/DeleteItemType", async function(req, res)
+{
+    var itemTypeID = req.query.itemTypeID;
+
+    mysql.selectData("SELECT * FROM item_types WHERE itmType_ID = '" + itemTypeID + "'").then(itemResult =>
+    {
+      var item_obj;
+      itemResult.forEach(function(element)
+      {
+        item_obj = element;
+        //renders ejs doc as html, replace document variables with options for the select field
+      });
+
+      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: "value = '" + item_obj.itemTypeID + "'",
+      itemTypeName: item_obj.item_Type});
+    });
+});
+
+app.get("/ItemTypeDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.query.itemID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.query.itemID});
+  }
+  });
+});
+
 //Edit Item Page
 app.get("/EditItem", async function(req, res)
 {
@@ -503,3 +567,9 @@ app.get("/ViewSaleRecords", async function(req, res)
 });
 
 // -----------------------------------------------------------------------------------------
+
+
+const server = http.createServer(app);
+server.listen(process.env.PORT || '3001', function () {
+  console.log('Server app listening on port 3001!');
+});

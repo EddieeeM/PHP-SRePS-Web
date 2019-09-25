@@ -20,33 +20,21 @@
 
   <h1>Delete Item</h1>
 
-  <form id="deleteItemForm" action="/ItemDeleted" method="post">
+  <form id="deleteItemForm" action="/ItemDeleted" method="get">
     <fieldset>
       <legend>Item Information</legend>
       <p><label for="itemID">Item ID:</label>
         <input  type="text" id="itemID" name="itemID" <%- itemID %> readonly/>
       </p>
-      
 
-      <p><label for="itemName">Name:</label>
-        <input required="required" type="text" name="itemName" id="itemName" <%- itemName %> readonly/>
-      </p>
-       
-      <p><label for="itemPrice">Price:</label>
-        <input required="required" type="number" step=".01" name="itemPrice" id="itemPrice" <%- itemPrice %>readonly/>
-      </p>
-      
-      <p><label for="itemType">Item Type:</label>
-        <select name="itemType" id="itemType" disabled>
-          <%- options %>
-        </select>
-      </p>
+
+      <input hidden="hidden" type="text" id="itemID" name="itemID" <%- itemID %>/>
+
+      <p>Name: <%= itemName %></p>
 
     </fieldset>
 
     <input type="submit" value="Delete" />
-    
-    
 
   </form>
 
