@@ -71,12 +71,7 @@ app.get("/AddItem", async function(req, res)
   });
 });
 
-app.get("/DeleteItem", async function(req, res)
-{
-  
-    res.render(path.join(__dirname + static_path + "deleteItem"));
- 
-});
+
 
 app.post("/ItemAdded", async function(req, res)
 {
@@ -92,10 +87,10 @@ app.post("/ItemAdded", async function(req, res)
 app.post("/ItemDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item WHERE Item_Name =  ('" + req.body.itemName + "');").then(result => {
+  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.body.itemID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName});
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName,itemID: req.body.itemID});
   }
   });
 });
@@ -413,6 +408,34 @@ app.get("/EditItem", async function(req, res)
         });
 
         res.render(path.join(__dirname + static_path + "editItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
+        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
+      });
+    });
+});
+
+app.get("/DeleteItem", async function(req, res)
+{
+  var itemID = req.query.itemID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result =>
+    {
+      var options_string = "";
+
+      result.forEach(function(element)
+      {
+        options_string += "<option value=" + element.itmType_ID + ">" + element.item_Type + "</option>";
+      });
+
+      mysql.selectData("SELECT * FROM item WHERE Item_ID = '" + itemID + "'").then(itemResult =>
+      {
+        var item_obj;
+        itemResult.forEach(function(element)
+        {
+          item_obj = element;
+          //renders ejs doc as html, replace document variables with options for the select field
+        });
+
+        res.render(path.join(__dirname + static_path + "deleteItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
         itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
       });
     });
