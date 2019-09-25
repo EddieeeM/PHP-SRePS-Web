@@ -82,6 +82,17 @@ app.post("/ItemAdded", async function(req, res)
   });
 });
 
+app.post("/ItemDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.body.itemID + "');").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName,itemID: req.body.itemID});
+  }
+  });
+});
+
 app.get("/AddSalesRecord", async function(req, res)
 {
   res.render(path.join(__dirname + static_path + "addSales"));
@@ -89,13 +100,32 @@ app.get("/AddSalesRecord", async function(req, res)
 
 app.post("/SalesRecordAdded", async function(req, res)
 {
-  console.log(req.body.item_info);
-  /*
-  //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "','" + req.body.salesDate + "'," + req.body.itemQuantity + ");").then(result => {
-  res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
+  var item_quantity_arr = req.body.item_info;
+
+  await mysql.selectData("INSERT INTO sales (Sale_Date) VALUES ('" + req.body.salesDate + "'); SELECT LAST_INSERT_ID() as insertid;").then(result => {
+
+      var return_obj;
+
+      result.forEach(function(element)
+      {
+        return_obj = element;
+      });
+
+      var sales_id = return_obj[0].insertid;
+
+      req.body.item_info.split("]").forEach(function(element)
+      {
+        if (element.trim().length > 0)
+        {
+          var string = element.trim();
+          string = string.substr(1,);
+          mysql.insertData("INSERT INTO sales_items (Item_ID, Quantity) VALUES ('" + string.split(",")[0] + "', '" + string.split(",")[1] + "')");
+
+        }
+      });
+
+      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
   });
-  */
 });
 
 app.get("/SearchSalesRecord", async function(req, res)
@@ -127,7 +157,6 @@ app.post("/ReturnSalesRecords", async function(req, res)
       {
         output_string = "<p>No Results Found</p>";
       }
-
     });
   }
   else
@@ -354,13 +383,13 @@ app.get("/DeleteSalesRecord", async function(req, res)
   });
 });
 
-app.get("/SalesRecordDeleted", async function(req, res)
+app.post("/SalesRecordDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.query.saleID + "');").then(result => {
+  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.query.saleID});
+    res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.body.saleID});
   }
   });
 });
@@ -378,23 +407,23 @@ app.get("/DeleteItem", async function(req, res)
         //renders ejs doc as html, replace document variables with options for the select field
       });
 
-      res.render(path.join(__dirname + static_path + "deleteItem"), {itemID: "value = '" + item_obj.Item_ID + "'",
+      res.render(path.join(__dirname + static_path + "deleteItem"), {itemID: item_obj.Item_ID, itemIDValue: "value = '" + item_obj.Item_ID + "'",
       itemName: item_obj.Item_Name});
     });
 });
 
-app.get("/ItemDeleted", async function(req, res)
+app.post("/ItemDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.query.itemID + "');").then(result => {
+  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.query.itemID});
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
   }
   });
 });
 
-app.get("/DeleteItemType", async function(req, res)
+app.post("/DeleteItemType", async function(req, res)
 {
     var itemTypeID = req.query.itemTypeID;
 
@@ -407,18 +436,18 @@ app.get("/DeleteItemType", async function(req, res)
         //renders ejs doc as html, replace document variables with options for the select field
       });
 
-      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: "value = '" + item_obj.itemTypeID + "'",
+      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: item_obj.itemTypeID, itemTypeIDValue: "value = '" + item_obj.itemTypeID + "'",
       itemTypeName: item_obj.item_Type});
     });
 });
 
-app.get("/ItemTypeDeleted", async function(req, res)
+app.post("/ItemTypeDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.query.itemID + "');").then(result => {
+  await mysql.insertData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.query.itemID});
+    res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemID});
   }
   });
 });
@@ -447,6 +476,34 @@ app.get("/EditItem", async function(req, res)
         });
 
         res.render(path.join(__dirname + static_path + "editItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
+        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
+      });
+    });
+});
+
+app.get("/DeleteItem", async function(req, res)
+{
+  var itemID = req.query.itemID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result =>
+    {
+      var options_string = "";
+
+      result.forEach(function(element)
+      {
+        options_string += "<option value=" + element.itmType_ID + ">" + element.item_Type + "</option>";
+      });
+
+      mysql.selectData("SELECT * FROM item WHERE Item_ID = '" + itemID + "'").then(itemResult =>
+      {
+        var item_obj;
+        itemResult.forEach(function(element)
+        {
+          item_obj = element;
+          //renders ejs doc as html, replace document variables with options for the select field
+        });
+
+        res.render(path.join(__dirname + static_path + "deleteItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
         itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
       });
     });
@@ -514,7 +571,6 @@ app.get("/ViewSaleRecords", async function(req, res)
 });
 
 // -----------------------------------------------------------------------------------------
-
 app.get("/getItems", async function(req, res)
 {
   await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + req.query.searchString + "%'").then(result => {
@@ -526,6 +582,50 @@ app.get("/getItemByID", async function(req, res)
 {
   await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = '" + req.query.itemID + "'").then(result => {
     res.send(result);
+  });
+});
+
+app.get("/EditSalesRecord", async function(req, res)
+{
+  var saleID = req.query.saleID;
+
+  await mysql.selectData("SELECT * FROM sales ORDER BY sales.Sale_ID").then(result =>
+    {
+      var options_string = "";
+
+      result.forEach(function(element)
+      {
+        options_string += "<option value=" + element.saleID + ">" + element.saleDate + "</option>";
+      });
+
+      mysql.selectData("SELECT * FROM sales WHERE Sale_ID = '" + saleID + "'").then(saleResult =>
+      {
+        var sale_obj;
+        saleResult.forEach(function(element)
+        {
+          sale_obj = element;
+          //renders ejs doc as html, replace document variables with options for the select field
+        });
+
+         res.render(path.join(__dirname + static_path + "editSales"), {options: HTMLParser.parse(options_string), saleID: "value = '" + sale_obj.salesID + "'",
+         salesDate: "value = '" + sale_obj.salesDate + "'"});
+       });
+
+
+      res.render(path.join(__dirname + static_path + "editSales"));
+
+    });
+});
+
+app.post("/SalesEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE sales SET Sale_ID = '" + req.body.saleID + "', Date = '" + req.body.salesDate +
+    "', Quantity = '" + req.body.itemQuantity + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "SalesEdited"), {name: req.body.saleID});
+  }
   });
 });
 

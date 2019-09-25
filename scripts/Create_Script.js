@@ -19,7 +19,7 @@ var config = {
   password: "",
   port: 3306,
   database: "peoplehealth"
-};  
+};
 
 
 //creates initial DB structure
@@ -37,7 +37,7 @@ exports.createDB = function(){
       throw err;
       return false;
     }});
-  
+
   //Creates new database
   var newDb = "CREATE DATABASE IF NOT EXISTS peoplehealth;";
 
@@ -49,8 +49,8 @@ exports.createDB = function(){
       conInitial.end();
       throw err;
       return false;
-    } 
-    
+    }
+
     console.log("Database 'peoplehealth' detected!");
     return result;
   });
@@ -61,7 +61,7 @@ exports.createDB = function(){
 exports.createTables = function(){
 
   var con = mysql.createConnection(initialconfig);
-  
+
   //Reconnects to run table scripts
   con.connect(function(err)
   {
@@ -78,7 +78,8 @@ exports.createTables = function(){
     //Queries
     var ItemTypes = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Item_Types (itmType_ID INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY, item_Type VARCHAR(20) NOT NULL);";
     var ItemTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Item (Item_ID INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_Name VARCHAR(20) NOT NULL, Price FLOAT(6) UNSIGNED NOT NULL, itmType_ID INT(8) UNSIGNED NOT NULL, FOREIGN KEY (itmType_ID) REFERENCES Item_Types(itmType_ID));";
-    var SalesTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Sales (Sale_ID INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_ID INT(6) UNSIGNED NOT NULL, Sale_Date DATE, Quantity INT(3), FOREIGN KEY (Item_ID) REFERENCES Item(Item_ID));";
+    var SalesTable = "USE peoplehealth; CREATE TABLE IF NOT EXISTS Sales (Sale_ID INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Sale_Date DATE);";
+    var SalesItems = "USE peoplehealth;  CREATE TABLE IF NOT EXISTS Sales_Items (Sale_ID INT (10) UNSIGNED AUTO_INCREMENT PRIMARY KEY, Item_ID INT(6) UNSIGNED NOT NULL, Quantity INT(3), FOREIGN KEY (Item_ID) REFERENCES Item(Item_ID));"
 
     //Runs all the create Table Queries
     async.parallel([
@@ -91,7 +92,7 @@ exports.createTables = function(){
         });
       },
       function(parallel_complete){
-        con.query(ItemTable, {}, function(err, results) 
+        con.query(ItemTable, {}, function(err, results)
         {
         if (err) return parallel_complete (err);
           console.log("Created Item Table successfully");
@@ -99,15 +100,23 @@ exports.createTables = function(){
         });
       },
       function(parallel_complete){
-        con.query(SalesTable, {}, function(err, results) 
+        con.query(SalesTable, {}, function(err, results)
+        {
+        if (err) return parallel_complete (err);
+          console.log("Created Sales Table successfully");
+          return results;
+        });
+      },
+      function(parallel_complete){
+        con.query(SalesItems, {}, function(err, results)
         {
           if (err) return parallel_complete (err);
-            console.log("Created Item Sales Table successfully");
+            console.log("Created Sales Items Table successfully");
             return results;
         });
       }
       ], function(err){
-        if (err) 
+        if (err)
           console.log(err);
           con.end();
       });

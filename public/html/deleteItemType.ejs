@@ -20,11 +20,15 @@
 
   <h1>Delete Item Type</h1>
 
-  <form id="deleteItemForm" action="/ItemTypeDeleted" method="get">
+  <form id="deleteItemForm" action="/ItemTypeDeleted" method="post">
     <fieldset>
       <legend>Item Type Information</legend>
 
-      <input hidden="hidden" type="text" id="itemTypeID" name="itemTypeID" <%- itemTypeID %>/>
+      <input hidden="hidden" type="text" id="itemTypeID" name="itemTypeID" <%- itemTypeIDValue %>/>
+
+      <p>Item Type ID:
+          <%= itemTypeID %>
+      </p>
 
       <p>Type Name: <%= itemTypeName %></p>
 

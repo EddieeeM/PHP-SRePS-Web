@@ -49,42 +49,6 @@
 
       $(this).closest("div").remove();
     });
-
-    $("#checkcapacity").click(function()
-    {
-      for (i = 0; i < items_arr.length; i++)
-      {
-        console.log(items_arr[i] + "|" + $("#" + items_arr[i]).find("input").val());
-        return_arr.push([items_arr[i],  $("#" + items_arr[i]).find("input").val()]);
-      }
-
-      var item_info = " ";
-      for (i = 0; i < return_arr.length; i++)
-      {
-        item_info += "["
-        for (j = 0; j < return_arr[i].length; j++)
-        {
-          item_info += return_arr[i][j].toString();
-
-          if (j < (return_arr[i].length - 1))
-          {
-            item_info += ",";
-          }
-        }
-
-        item_info += "]"
-
-        if (i < (return_arr.length - 1))
-        {
-          item_info += ",";
-        }
-      }
-
-      $("#item_info").val(item_info);
-      console.log(item_info);
-      return_arr = [];
-    });
-
   });
 
   function draw_item_input(item_id)
@@ -103,6 +67,41 @@
     }
     });
 
+  }
+
+  function collect_item_data()
+  {
+    for (i = 0; i < items_arr.length; i++)
+    {
+      console.log(items_arr[i] + "|" + $("#" + items_arr[i]).find("input").val());
+      return_arr.push([items_arr[i],  $("#" + items_arr[i]).find("input").val()]);
+    }
+
+    var item_info = " ";
+    for (i = 0; i < return_arr.length; i++)
+    {
+      item_info += "["
+      for (j = 0; j < return_arr[i].length; j++)
+      {
+        item_info += return_arr[i][j].toString();
+
+        if (j < (return_arr[i].length - 1))
+        {
+          item_info += ",";
+        }
+      }
+
+      item_info += "]"
+
+      if (i < (return_arr.length - 1))
+      {
+        item_info += ",";
+      }
+    }
+
+    $("#item_info").val(item_info);
+    console.log(item_info);
+    return_arr = [];
   }
   </script>
 </head>
@@ -132,7 +131,7 @@
       <div id="item_selection">
       </div>
 
-      <form id="addSalesForm" action="/SalesRecordAdded" method="post">
+      <form id="addSalesForm" action="/SalesRecordAdded" method="post" onsubmit="collect_item_data()">
 
         <button id="checkcapacity">Check Capacity</button>
 
