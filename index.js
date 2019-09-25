@@ -84,26 +84,18 @@ app.post("/ItemAdded", async function(req, res)
 
 app.get("/AddSalesRecord", async function(req, res)
 {
-  //waits for the response for database, then continues, utilizing the response string
-  await mysql.selectData("SELECT * FROM item ORDER BY item.Item_Name").then(result => {
-
-    var options_string = "";
-
-    result.forEach(function(element)
-    {
-      options_string += "<option value=" + element.Item_ID + ">" + element.Item_Name + "</option>";
-    });
-
-    res.render(path.join(__dirname + static_path + "addSales"), {options: HTMLParser.parse(options_string)});
-  });
+  res.render(path.join(__dirname + static_path + "addSales"));
 });
 
 app.post("/SalesRecordAdded", async function(req, res)
 {
+  console.log(req.body.item_info);
+  /*
   //waits for the response for database, then continues, utilizing the response string
   await mysql.insertData("INSERT INTO sales (Item_ID, Sale_Date, Quantity) VALUES ('" + req.body.itemID + "','" + req.body.salesDate + "'," + req.body.itemQuantity + ");").then(result => {
   res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
   });
+  */
 });
 
 app.get("/SearchSalesRecord", async function(req, res)
@@ -117,8 +109,6 @@ app.post("/ReturnSalesRecords", async function(req, res)
   var search_date = req.body.searchDate;
   var start_date = req.body.startDate;
   var end_date = req.body.endDate;
-
-  console.log(start_date);
 
   var output_string = "";
 
@@ -173,8 +163,6 @@ app.get("/DownloadCSV", async function(req, res)
   }
 
   var output_string = "";
-
-  console.log(end_date);
 
   if (end_date.length > 0)
   {
@@ -254,8 +242,6 @@ app.get("/DisplaySalesReport", async function(req, res)
   }
 
   var output_string = "";
-
-  console.log(end_date);
 
   if (end_date.length > 0)
   {
@@ -529,6 +515,19 @@ app.get("/ViewSaleRecords", async function(req, res)
 
 // -----------------------------------------------------------------------------------------
 
+app.get("/getItems", async function(req, res)
+{
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + req.query.searchString + "%'").then(result => {
+    res.send(result);
+  });
+});
+
+app.get("/getItemByID", async function(req, res)
+{
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = '" + req.query.itemID + "'").then(result => {
+    res.send(result);
+  });
+});
 
 const server = http.createServer(app);
 server.listen(process.env.PORT || '3001', function () {

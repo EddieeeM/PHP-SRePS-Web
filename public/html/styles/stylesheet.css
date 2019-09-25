@@ -2,6 +2,7 @@ body {
   margin-left: 15em;
   margin-right: 15em;
   background-image: url("images/background.jpg");
+  font-family: sans-serif;
   /* Photo by Sarah Dorweiler on Unsplash */
 }
 /* Navbar container */
@@ -82,11 +83,11 @@ body {
 
 /* Align text in main information area */
 .span-info-box {
-  text-align: center;  
+  text-align: center;
 }
 
 /* Allows each span in the manage sales area to take up 1/3rd of the screen */
-.span-third {  
+.span-third {
   width:33%;
   display:inline-block;
   text-align: center;
@@ -116,7 +117,7 @@ body {
   border: 1px solid #dddddd;
   border-radius: 3px;
   margin-bottom: 20px;
-  border-color: #263037; 
+  border-color: #263037;
 }
 
 /* Sections of text in squares*/
@@ -164,7 +165,7 @@ tr:nth-child(odd) {
 /* Hover white over current row */
 tr:hover {
   background-color: white;
-} 
+}
 
 /* End of MANAGE SALES, VIEW SALES RECORDS CSS */
 /* PLEASE LEAVE THESE MARKERS  */
