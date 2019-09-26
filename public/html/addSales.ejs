@@ -66,7 +66,6 @@
        parseInt(item_result.Item_ID) + "'/></p><button id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
     }
     });
-
   }
 
   function collect_item_data()
@@ -112,19 +111,18 @@
   </div>
 
   <h1>Add Sales Record</h1>
+  <fieldset>
+    <legend>Sales Information</legend>
 
     <fieldset>
-      <legend>Sales Information</legend>
+      <legend>Select Item(s)</legend>
+      <p><label for="item_search">Item Search:</label>
+        <input type="text" name="item_search" id="item_search"/>
+        <button name="search_btn" id="search_btn">Search</button>
+      </p>
 
-      <fieldset>
-        <legend>Select Item(s)</legend>
-        <p><label for="item_search">Item Search:</label>
-          <input type="text" name="item_search" id="item_search"/>
-          <button name="search_btn" id="search_btn">Search</button>
-        </p>
-
-        <p id="items"></p>
-      </fieldset>
+      <p id="items"></p>
+    </fieldset>
 
       <br/>
 
@@ -132,19 +130,14 @@
       </div>
 
       <form id="addSalesForm" action="/SalesRecordAdded" method="post" onsubmit="collect_item_data()">
+        <p><label for="salesDate">Sales Date:</label>
+          <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
+        </p>
 
-        <button id="checkcapacity">Check Capacity</button>
-
-      <p><label for="salesDate">Sales Date:</label>
-        <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
-      </p>
-
-      <input type="text" hidden id="item_info" name="item_info" value=" "/>
-
-    <input type="submit" value="Submit" />
-    <input type="reset" value="Reset Form" />
-
-  </form>
+        <input type="text" hidden id="item_info" name="item_info" value=" "/>
+        <input type="submit" value="Submit" />
+        <input type="reset" value="Reset Form" />
+      </form>
 </fieldset>
 
   <br />

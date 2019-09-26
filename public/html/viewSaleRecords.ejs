@@ -44,7 +44,7 @@
           <td><%= SalesData[i].Item_ID %></td>
           <td><%= SalesData[i].Sale_Date %></td>
           <td><%= SalesData[i].Quantity %></td>
-          <td></td>
+          <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
           <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
         </tr>
     <% }

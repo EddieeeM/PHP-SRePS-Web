@@ -118,13 +118,13 @@ app.post("/SalesRecordAdded", async function(req, res)
         if (element.trim().length > 0)
         {
           var string = element.trim();
-          string = string.substr(1,);
-          mysql.insertData("INSERT INTO sales_items (Item_ID, Quantity) VALUES ('" + string.split(",")[0] + "', '" + string.split(",")[1] + "')");
-
+          string = string.split("[")[1];
+          console.log(string);
+          mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + sales_id + "' ,'" + string.split(",")[0] + "', '" + string.split(",")[1] + "')");
         }
       });
 
-      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate,quantity: req.body.itemQuantity});
+      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate, quantity: req.body.itemQuantity});
   });
 });
 
@@ -369,7 +369,7 @@ app.get("/DeleteSalesRecord", async function(req, res)
 {
   var saleID = req.query.saleID;
 
-  mysql.selectData("SELECT * FROM sales JOIN item ON sales.Item_ID = item.Item_ID WHERE Sale_ID = '" + saleID +
+  mysql.selectData("SELECT * FROM sales WHERE Sale_ID = '" + saleID +
   "'").then(itemResult =>
   {
     var sale_obj;
@@ -379,17 +379,19 @@ app.get("/DeleteSalesRecord", async function(req, res)
       //renders ejs doc as html, replace document variables with options for the select field
     });
 
-    res.render(path.join(__dirname + static_path + "deleteSales"), {saleIDValue: "value = '" + sale_obj.Sale_ID + "'", saleID: sale_obj.Sale_ID, saleDate: sale_obj.Sale_Date, itemName: sale_obj.Item_Name});
+    res.render(path.join(__dirname + static_path + "deleteSales"), {saleIDValue: "value = '" + sale_obj.Sale_ID + "'", saleID: sale_obj.Sale_ID, saleDate: sale_obj.Sale_Date});
   });
 });
 
 app.post("/SalesRecordDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
+  await mysql.insertData("DELETE FROM sales_items WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.body.saleID});
+    mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
+      res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.body.saleID});
+    });
   }
   });
 });
@@ -580,7 +582,7 @@ app.get("/getItems", async function(req, res)
 
 app.get("/getItemByID", async function(req, res)
 {
-  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = '" + req.query.itemID + "'").then(result => {
+  await mysql.selectData('SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = "' + req.query.itemID + '"').then(result => {
     res.send(result);
   });
 });
@@ -589,43 +591,82 @@ app.get("/EditSalesRecord", async function(req, res)
 {
   var saleID = req.query.saleID;
 
-  await mysql.selectData("SELECT * FROM sales ORDER BY sales.Sale_ID").then(result =>
-    {
-      var options_string = "";
-
-      result.forEach(function(element)
+  await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID WHERE sales.Sale_ID = '" + saleID + "'").then(saleResult =>
       {
-        options_string += "<option value=" + element.saleID + ">" + element.saleDate + "</option>";
-      });
-
-      mysql.selectData("SELECT * FROM sales WHERE Sale_ID = '" + saleID + "'").then(saleResult =>
-      {
+        var sale_items = "";
         var sale_obj;
         saleResult.forEach(function(element)
         {
           sale_obj = element;
+          sale_items += "[" + element.Item_ID + "," + element.Quantity + "],"
           //renders ejs doc as html, replace document variables with options for the select field
         });
 
-         res.render(path.join(__dirname + static_path + "editSales"), {options: HTMLParser.parse(options_string), saleID: "value = '" + sale_obj.salesID + "'",
-         salesDate: "value = '" + sale_obj.salesDate + "'"});
+        //https://stackoverflow.com/questions/3066586/get-string-in-yyyymmdd-format-from-js-date-object?page=2&tab=votes#tab-top
+        var b = sale_obj.Sale_Date.getFullYear();
+        var c = sale_obj.Sale_Date.getMonth();
+        (++c < 10)? c = "0" + c : c;
+        var d = sale_obj.Sale_Date.getDate();
+        (d < 10)? d = "0" + d : d;
+        var final = b + "-" + c + "-" + d;
+
+         res.render(path.join(__dirname + static_path + "editSales"), {saleID: "value = '" + sale_obj.Sale_ID + "'",
+         saleDate: "value = '" + final + "'", sale_items: sale_items});
        });
-
-
-      res.render(path.join(__dirname + static_path + "editSales"));
-
-    });
 });
 
 app.post("/SalesEdited", async function(req, res)
 {
-  //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("UPDATE sales SET Sale_ID = '" + req.body.saleID + "', Date = '" + req.body.salesDate +
-    "', Quantity = '" + req.body.itemQuantity + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result => {
-  if (result)
+  //old items, currently in database
+  var old_item_id_array = [];
+
+
+  var item_id_array = [];
+  req.body.item_info.split("]").forEach(function(element)
   {
-    res.render(path.join(__dirname + static_path + "SalesEdited"), {name: req.body.saleID});
-  }
+    if (element.trim().length > 0)
+    {
+      var string = element.trim();
+      string = string.split("[")[1];
+      item_id_array.push([parseInt(string.split(",")[0]), parseInt(string.split(",")[1])]);
+    }
+  });
+
+  await mysql.selectData("SELECT * FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
+  {
+    result.forEach(function(element)
+    {
+      old_item_id_array.push(parseInt(element.Item_ID));
+      var filter_entries = item_id_array.filter(i => parseInt(i[0]) == parseInt(element.Item_ID));
+      if (filter_entries.length == 0)
+      {
+        mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
+      }
+      else
+      {
+        mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
+      }
+      //if not present in item_id_array insert here!
+    })
+
+    item_id_array.forEach(function(element)
+    {
+      if (!old_item_id_array.includes(parseInt(element[0])))
+      {
+        //remove element!
+        mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + req.body.saleID + "', '" + element[0] + "', '" + element[1] + "')");
+      }
+    });
+
+
+    mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
+    {
+      res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
+
+    });
+
+    //then update for the rest
+
   });
 });
 
