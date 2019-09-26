@@ -13,9 +13,12 @@
   <link href="/html/styles/stylesheet.css" rel="stylesheet" />
 
   <script>
+  //stores the currently selected items for sale, this prevents having multiple entries of the same item
   var items_arr = [];
-  var return_arr = [];
 
+  //the return array is the array return from the form, which is written to a hidden text input inside the form
+  var return_arr = [];
+  
     $( document ).ready(function()
     {
       var item_details = $("#sale_items").html();
@@ -26,7 +29,6 @@
         if (element.trim().length > 0)
         {
           selection_str = element.split("[")[1].trim();
-          console.log(selection_str);
           var item_id = selection_str.split(",")[0];
           var item_capacity = selection_str.split(",")[1];
           items_arr.push(item_id.trim());
@@ -34,6 +36,8 @@
         }
       });
 
+      //when a button with id = remove_element inside div with id = item_selection,
+      //item seleection item is removed and element is removed from items_arr
       $("#item_selection").on("click", "#remove_element", function()
       {
         var index = items_arr.indexOf($(this).val());
@@ -42,6 +46,7 @@
         $(this).closest("div").remove();
       });
 
+      //when a button with id = add_item inside div with id = items, items is added to sale, and then display to page
       $("#items").on("click", "#add_item", function()
       {
         if (!items_arr.includes($(this).val()))
@@ -56,11 +61,13 @@
       {
         $.ajax({url: "/getItems?searchString=" + $("#item_search").val(), success: function(result){
           var output_string = "";
+          //loops through returned SQL results, constructing an output string
           result.forEach(function(element)
           {
             output_string += "<p>Item: " + element.Item_ID + " | " + element.Item_Name + " <button name='add_item' id='add_item' value='" + element.Item_ID + "'>Add Item</button></p>";
           });
 
+          //output string write to div with id = items
           $("#items").html("<hr/>" + output_string);
         }
         });
@@ -68,16 +75,19 @@
 
     });
 
+    //draws new section to page, gets infomation for section from input item_id
     function draw_item_input(item_id, item_capacity)
     {
+      //ajax request to get a list of return objects
       $.ajax({url: "/getItemByID?itemID=" + item_id, success: function(result){
         var item_result;
+        //loops through return objects, selecting the last on
         result.forEach(function(element)
         {
-          console.log(element.Item_ID);
           item_result = element;
         });
 
+        //prints to page the item selection element with item specific details
         $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
          + "</strong></p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
          parseInt(item_result.Item_ID) + "' value='" + item_capacity + "'/></p><button id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
@@ -85,15 +95,18 @@
       });
     }
 
+    //gets the quantity selection for all of the sale items
     function collect_item_data()
     {
+      //loops through all elements in items_arr array, constructs multi dimensional item_id_array
+      //the array has item id at position 1 and item quantity at position 2
       for (i = 0; i < items_arr.length; i++)
       {
-        console.log(items_arr[i] + "|" + $("#" + items_arr[i]).find("input").val());
         return_arr.push([items_arr[i],  $("#" + items_arr[i]).find("input").val()]);
       }
 
       var item_info = " ";
+      //through through the constructed return arr, and construct a string out of the array
       for (i = 0; i < return_arr.length; i++)
       {
         item_info += "["
@@ -115,8 +128,8 @@
         }
       }
 
+      //writes the itme_info string to the input with
       $("#item_info").val(item_info);
-      console.log(item_info);
       return_arr = [];
     }
   </script>

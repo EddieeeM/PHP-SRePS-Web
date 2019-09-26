@@ -102,29 +102,36 @@ app.post("/SalesRecordAdded", async function(req, res)
 {
   var item_quantity_arr = req.body.item_info;
 
+  //inserts master record
   await mysql.selectData("INSERT INTO sales (Sale_Date) VALUES ('" + req.body.salesDate + "'); SELECT LAST_INSERT_ID() as insertid;").then(result => {
 
       var return_obj;
 
+      //then loops result object, selecting last entry
       result.forEach(function(element)
       {
         return_obj = element;
       });
 
+      //the query has returned the last auto increment ID it assigned for the transaction, which is the ID for the sales entry
       var sales_id = return_obj[0].insertid;
 
+      //the item info is split into it's components
+      //item info follow this structure: [item_id, quantity],[item_id, quantity],
       req.body.item_info.split("]").forEach(function(element)
       {
         if (element.trim().length > 0)
         {
           var string = element.trim();
+          //this string has the item_id and capacity, seperated by a comma
           string = string.split("[")[1];
-          console.log(string);
+          //inserts new record into sales_items
           mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + sales_id + "' ,'" + string.split(",")[0] + "', '" + string.split(",")[1] + "')");
         }
       });
 
-      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate, quantity: req.body.itemQuantity});
+      //page is renders with
+      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate});
   });
 });
 
@@ -386,9 +393,11 @@ app.get("/DeleteSalesRecord", async function(req, res)
 app.post("/SalesRecordDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
+  //deletes linked items
   await mysql.insertData("DELETE FROM sales_items WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
   if (result)
   {
+    //deletes master sales record itself
     mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
       res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.body.saleID});
     });
@@ -589,12 +598,15 @@ app.get("/getItemByID", async function(req, res)
 
 app.get("/EditSalesRecord", async function(req, res)
 {
+  //sale ID is stored in get variable is url, which is returned here
   var saleID = req.query.saleID;
 
   await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID WHERE sales.Sale_ID = '" + saleID + "'").then(saleResult =>
       {
         var sale_items = "";
         var sale_obj;
+
+        //loops through all of the returned record and constructs returns string from elements
         saleResult.forEach(function(element)
         {
           sale_obj = element;
@@ -602,6 +614,7 @@ app.get("/EditSalesRecord", async function(req, res)
           //renders ejs doc as html, replace document variables with options for the select field
         });
 
+        //constructs date string for sql date object
         //https://stackoverflow.com/questions/3066586/get-string-in-yyyymmdd-format-from-js-date-object?page=2&tab=votes#tab-top
         var b = sale_obj.Sale_Date.getFullYear();
         var c = sale_obj.Sale_Date.getMonth();
@@ -610,6 +623,7 @@ app.get("/EditSalesRecord", async function(req, res)
         (d < 10)? d = "0" + d : d;
         var final = b + "-" + c + "-" + d;
 
+        //render page
          res.render(path.join(__dirname + static_path + "editSales"), {saleID: "value = '" + sale_obj.Sale_ID + "'",
          saleDate: "value = '" + final + "'", sale_items: sale_items});
        });
@@ -620,37 +634,53 @@ app.post("/SalesEdited", async function(req, res)
   //old items, currently in database
   var old_item_id_array = [];
 
-
+  //new items, returns for the form submission
   var item_id_array = [];
+
+  //the item info is split into it's components
+  //item info follow this structure: [item_id, quantity],[item_id, quantity],
   req.body.item_info.split("]").forEach(function(element)
   {
     if (element.trim().length > 0)
     {
       var string = element.trim();
+      //this string has the item_id and capacity, seperated by a comma
       string = string.split("[")[1];
+      //pushs split string into a multidimesional array
       item_id_array.push([parseInt(string.split(",")[0]), parseInt(string.split(",")[1])]);
     }
   });
 
+  //selects all of the sales items associated with the sale record currently in the database
   await mysql.selectData("SELECT * FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
   {
+    //loops through all of the elements in sql result object
     result.forEach(function(element)
     {
+      //adds ID of old element to array
       old_item_id_array.push(parseInt(element.Item_ID));
+      //filters entry, producing an array
+      //return array, indicates array returned from form, includes a currrent sales item
       var filter_entries = item_id_array.filter(i => parseInt(i[0]) == parseInt(element.Item_ID));
+
+      //if it doesn't contain the item, it is deleted
       if (filter_entries.length == 0)
       {
         mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
       }
       else
       {
+        //if it does contain the item, it is updated with returned form details
         mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
       }
       //if not present in item_id_array insert here!
     })
 
+    //loops through list of item return from form
     item_id_array.forEach(function(element)
     {
+      //if there is an item that exists in the new array that doesn't exist in the old item_id_array
+      //then this is added to the database
       if (!old_item_id_array.includes(parseInt(element[0])))
       {
         //remove element!
@@ -658,15 +688,12 @@ app.post("/SalesEdited", async function(req, res)
       }
     });
 
-
+    //master sales record is then updated
     mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
     {
+      //page is then rendered
       res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
-
     });
-
-    //then update for the rest
-
   });
 });
 
