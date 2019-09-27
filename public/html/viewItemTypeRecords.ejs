@@ -14,7 +14,7 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Sales Records</h1>
+  <h1>Item Types</h1>
 
   <!-- Table to display Sales Record Data -->
   <table class="table table-hover table-bordered">
@@ -22,10 +22,8 @@
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Sale ID</th>
-        <th scope="col">Item ID</th>
-        <th scope="col">Sale Date</th>
-        <th scope="col">Quantity</th>
+        <th scope="col">Item Type ID</th>
+        <th scope="col">Item Type Name</th>
         <th scope="col">Edit</th>
         <th scope="col">Delete</th>
       </tr>
@@ -35,17 +33,15 @@
     <tbody>
 
     <!-- If there is table data - print it out -->
-    <% if(SalesData.length) {
+    <% if(ItemData.length) {
       <!-- Create table entry for each observation -->
-      for(var i = 0; i < SalesData.length;i++)
+      for(var i = 0; i < ItemData.length;i++)
       { %>
         <tr>
-          <td><%= SalesData[i].Sale_ID %></td>
-          <td><%= SalesData[i].Item_ID %></td>
-          <td><%= SalesData[i].Sale_Date %></td>
-          <td><%= SalesData[i].Quantity %></td>
-          <td></td>
-          <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
+          <td><%= ItemData[i].itmType_ID %></td>
+          <td><%= ItemData[i].item_Type %></td>
+          <td><a href='/EditItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Edit Item Type</a></td>
+          <td><a href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>
         </tr>
     <% }
     }
@@ -53,7 +49,7 @@
     else { %>
       <tr>
       	<!-- Alert the user -->
-        <td colspan="4">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
+        <td colspan="2">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="PHP-SRePS" />
+  <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+  <meta name="author" content="Wilson To" />
+  <title>Delete Item Type</title>
+
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <div class="navbar" id="navbar">
+  </div>
+
+  <h1>Delete Item Type</h1>
+
+  <form id="deleteItemForm" action="/ItemTypeDeleted" method="post">
+    <fieldset>
+      <legend>Item Type Information</legend>
+
+      <input hidden="hidden" type="text" id="itemTypeID" name="itemTypeID" <%- itemTypeIDValue %>/>
+
+      <p>Item Type ID:
+          <%= itemTypeID %>
+      </p>
+
+      <p>Type Name: <%= itemTypeName %></p>
+
+    </fieldset>
+
+    <input type="submit" value="Delete" />
+
+  </form>
+
+  <br/>
+
+  <div id="footer">
+  </div>
+
+</body>
+
+</html>

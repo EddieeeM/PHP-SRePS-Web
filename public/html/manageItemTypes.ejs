@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Item Type Manager</title>
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <!-- All CSS for this webpage can be found in a section in the stylesheet -->
+  <link href="html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Include Header element -->
+  <div class="navbar" id="navbar"></div>
+  <br />
+
+  <!-- Information box with general information -->
+  <span class="span-info-box">
+    <article class="media content-section">
+      <span class="media-body">
+        <span class="article-metadata tool-title">
+          <a class="mr-2"><b>Item Type Management</b></a>
+        </span>
+          <p class="article-content">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </span>
+    </article>
+  </span>
+
+  <!-- Spans to hold a button / text for each of the sales management tools -->
+  <!-- Each span takes up 33% of the screen and is inline block, see CSS for more information -->
+
+  <!-- Left -->
+  <span class="span-third">
+    <article class="media content-section">
+      <span class="media-body">
+        <span class="article-metadata tool-title">
+          <a class="mr-2"><b>View Item Types</b></a>
+        </span>
+        <p class="article-content">Table Display of all Item Record Data</p>
+        <a class="sales-management-button" href="/ViewItemTypeRecords" class="button">View Item(s)</a>
+      </span>
+    </article>
+  </span>
+
+  <!-- Middle -->
+  <!-- Links to home for now -->
+  <span class="span-third">
+    <article class="media content-section">
+      <span class="media-body">
+        <span class="article-metadata tool-title">
+          <a class="mr-2"><b>Add Item Types</b></a>
+        </span>
+        <p class="article-content">Form to add Item Record Data</p>
+        <a class="sales-management-button" href="/AddItemType" class="button">Add Item(s)</a>
+      </span>
+    </article>
+  </span>
+
+  <!-- Right -->
+  <!-- Links to home for now -->
+  <span class="span-third">
+    <article class="media content-section">
+      <span class="media-body">
+        <span class="article-metadata tool-title">
+          <a class="mr-2"><b>Edit Item Types</b></a>
+        </span>
+        <p class="article-content">Edit Item Types</p>
+        <a class="sales-management-button" href="/" class="button">Edit Item Type(s)</a>
+      </span>
+    </article>
+  </span>
+
+  <!-- Include Footer element -->
+  <br />
+  <div id="footer"> </div>
+</body>
+</html>
