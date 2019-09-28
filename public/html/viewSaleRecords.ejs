@@ -23,9 +23,8 @@
     <thead>
       <tr>
         <th scope="col">Sale ID</th>
-        <th scope="col">Item ID</th>
         <th scope="col">Sale Date</th>
-        <th scope="col">Quantity</th>
+        <th scope="col">Item Info</th>
         <th scope="col">Edit</th>
         <th scope="col">Delete</th>
       </tr>
@@ -36,18 +35,53 @@
 
     <!-- If there is table data - print it out -->
     <% if(SalesData.length) {
+      var sales_id = "";
+      var items_string = "";
       <!-- Create table entry for each observation -->
       for(var i = 0; i < SalesData.length;i++)
-      { %>
-        <tr>
-          <td><%= SalesData[i].Sale_ID %></td>
-          <td><%= SalesData[i].Item_ID %></td>
-          <td><%= SalesData[i].Sale_Date %></td>
-          <td><%= SalesData[i].Quantity %></td>
-          <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
-          <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
-        </tr>
-    <% }
+      {
+        if (sales_id.length == 0)
+        {
+          sales_id = SalesData[i].Sale_ID;
+        }
+
+        if (sales_id != SalesData[i].Sale_ID)
+        {
+          sales_id = SalesData[i].Sale_ID;
+          %>
+          <tr>
+            <td><%= SalesData[i].Sale_ID %></td>
+            <td><%= SalesData[i].Sale_Date %></td>
+            <td><%= items_string %></td>
+            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
+            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
+          </tr>
+          <%
+          items_string = "";
+        }
+        else
+        {
+          if (items_string.length > 0)
+          {
+            items_string += " | ";
+          }
+
+          items_string += "Item ID: " + SalesData[i].Item_ID + ", Item Name: " + SalesData[i].Item_Name + ", Quantity: " + SalesData[i].Quantity;
+        }
+
+        if (i == (SalesData.length - 1))
+        {
+          %>
+          <tr>
+            <td><%= SalesData[i].Sale_ID %></td>
+            <td><%= SalesData[i].Sale_Date %></td>
+            <td><%= items_string %></td>
+            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
+            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
+          </tr>
+          <%
+        }
+      }
     }
     <!-- Else there is no table data -->
     else { %>

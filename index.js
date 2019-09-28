@@ -152,7 +152,7 @@ app.post("/ReturnSalesRecords", async function(req, res)
   if (search_date == "true")
   {
     //waits for the response for database, then continues, utilizing the response string
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + search_string +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE item.Item_Name LIKE '%" + search_string +
     "%' OR item_types.item_Type LIKE '%" + search_string + "%' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
       result.forEach(function(element)
@@ -169,7 +169,7 @@ app.post("/ReturnSalesRecords", async function(req, res)
   else
   {
     //waits for the response for database, then continues, utilizing the response string
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + search_string +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE item.Item_Name LIKE '%" + search_string +
       "%' OR item_types.item_Type LIKE '%" + search_string + "%'").then(result => {
 
       result.forEach(function(element)
@@ -203,12 +203,13 @@ app.get("/DownloadCSV", async function(req, res)
   if (end_date.length > 0)
   {
     //waits for the response for database, then continues, utilizing the response string
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
       result.forEach(function(element)
       {
-        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," + element.Sale_Date + '\n';
+        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
+          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';
       });
 
       if (output_string.length == 0)
@@ -236,13 +237,13 @@ app.get("/DownloadCSV", async function(req, res)
 
     var final_start_date = year + "-" + month + "-00";
 
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
       result.forEach(function(element)
       {
-        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," + element.Sale_Date + '\n';
-      });
+        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
+          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';      });
 
       if (output_string.length == 0)
       {
@@ -252,9 +253,15 @@ app.get("/DownloadCSV", async function(req, res)
     });
   }
 
-  output_string = "Sales ID, Quantity, Item ID, Item Name, Sale Date" + '\n' + output_string;
-
-  res.setHeader('Content-disposition', 'attachment; filename=shifts-report.csv');
+  output_string = "Sales ID, Quantity, Item ID, Item Name, Item Type ID, Item Type Name, Sale Date" + '\n' + output_string;
+  if (end_date.length > 0)
+  {
+    res.setHeader('Content-disposition', 'attachment; filename=sales_report' + start_date + '-' + end_date + '.csv');
+  }
+  else
+  {
+    res.setHeader('Content-disposition', 'attachment; filename=sales_report' + start_date + '.csv');
+  }
   res.set('Content-Type', 'text/csv');
   res.status(200).send(output_string);
 })
@@ -282,7 +289,7 @@ app.get("/DisplaySalesReport", async function(req, res)
   if (end_date.length > 0)
   {
     //waits for the response for database, then continues, utilizing the response string
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
       result.forEach(function(element)
@@ -315,7 +322,7 @@ app.get("/DisplaySalesReport", async function(req, res)
 
     var final_start_date = year + "-" + month + "-00";
 
-    await mysql.selectData("SELECT * FROM sales JOIN item on sales.Item_ID = item.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
       result.forEach(function(element)
@@ -574,7 +581,7 @@ app.get("/ViewSaleRecords", async function(req, res)
 {
   // Querey database and wait for result response
   // Returns ALL sales records and passes in array
-  await mysql.selectData("SELECT * FROM sales").then(result => {
+  await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID").then(result => {
 
     // Render view and pass result of query to be displayed
     res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
