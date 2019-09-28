@@ -35,19 +35,20 @@
 
     <!-- If there is table data - print it out -->
     <% if(SalesData.length) {
-      var sales_id = "";
+      var sales_id = SalesData[0].Sale_ID;
       var items_string = "";
       console.log(SalesData);
       <!-- Create table entry for each observation -->
       for(var i = 0; i < SalesData.length;i++)
       {
-        if (sales_id.length == 0)
-        {
-          sales_id = SalesData[i].Sale_ID;
-        }
-
         if (sales_id != SalesData[i].Sale_ID)
         {
+          sales_id = SalesData[i].Sale_ID;
+          if (items_string.length == 0)
+          {
+            items_string += "Item ID: " + SalesData[i - 1].Item_ID + ", Item Name: " + SalesData[i - 1].Item_Name + ", Quantity: " + SalesData[i - 1].Quantity;
+          }
+
           %>
           <tr>
             <td><%= SalesData[i - 1].Sale_ID %></td>
@@ -57,7 +58,6 @@
             <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
           </tr>
           <%
-          sales_id = SalesData[i].Sale_ID;
           items_string = "";
         }
         else
