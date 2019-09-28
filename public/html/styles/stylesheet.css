@@ -110,7 +110,7 @@ input, select{
   background:#007FB8;
   padding:.5rem;
   color:white;
-  margin:1rem 5px;
+  margin:0.25rem 5px;
   width:auto;
   text-transform:uppercase;
   cursor:pointer;
@@ -134,7 +134,7 @@ fieldset legend {
   font-size: 20px;
 }
 
-form label {
+label {
   font-family:Verdana, Geneva, sans-serif;
   font-weight: bold;
 }
