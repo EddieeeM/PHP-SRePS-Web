@@ -1,9 +1,9 @@
 body {
   margin-left: 15em;
   margin-right: 15em;
-  background-image: url("images/background.jpg");  /* Photo by Sarah Dorweiler on Unsplash */
-  /* background-repeat:no-repeat;
-  background-size:cover; */
+  background-image: url("images/background.jpg");
+  font-family: sans-serif;
+  /* Photo by Sarah Dorweiler on Unsplash */
 }
 
 * {font-family: calabri;

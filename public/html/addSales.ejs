@@ -11,6 +11,113 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
   <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+
+  <script>
+  //stores the currently selected items for sale, this prevents having multiple entries of the same item
+  var items_arr = [];
+
+  //the return array is the array return from the form, which is written to a hidden text input inside the form
+  var return_arr = [];
+
+  $( document ).ready(function()
+  {
+    $("#search_btn").click(function()
+    {
+      $.ajax({url: "/getItems?searchString=" + $("#item_search").val(), success: function(result){
+        var output_string = "";
+        //loops through returned SQL results, constructing an output string
+        result.forEach(function(element)
+        {
+          output_string += "<p>Item: " + element.Item_ID + " | " + element.Item_Name + " <button name='add_item' id='add_item' value='" + element.Item_ID + "'>Add Item</button></p>";
+        });
+
+        //output string write to div with id = items
+        $("#items").html("<hr/>" + output_string);
+      }
+      });
+    });
+
+    //when a button with id = add_item inside div with id = items, items is added to sale, and then display to page
+    $("#items").on("click", "#add_item", function()
+    {
+      if (!items_arr.includes($(this).val()))
+      {
+        items_arr.push($(this).val());
+        draw_item_input($(this).val());
+        console.log(items_arr);
+      }
+    });
+
+    //when a button with id = remove_element inside div with id = item_selection,
+    //item seleection item is removed and element is removed from items_arr
+    $("#item_selection").on("click", "#remove_element", function()
+    {
+      var index = items_arr.indexOf($(this).val());
+      if (index !== -1) items_arr.splice(index, 1);
+
+      $(this).closest("div").remove();
+    });
+  });
+
+//draws new section to page, gets infomation for section from input item_id
+  function draw_item_input(item_id)
+  {
+    //ajax request to get a list of return objects
+    $.ajax({url: "/getItemByID?itemID=" + item_id, success: function(result)
+    {
+      var item_result;
+      //loops through return objects, selecting the last on
+      result.forEach(function(element)
+      {
+        item_result = element;
+      });
+
+      //prints to page the item selection element with item specific details
+      $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
+       + "</strong></p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
+       parseInt(item_result.Item_ID) + "'/></p><button id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
+    }
+    });
+  }
+
+  //gets the quantity selection for all of the sale items
+  function collect_item_data()
+  {
+    //loops through all elements in items_arr array, constructs multi dimensional item_id_array
+    //the array has item id at position 1 and item quantity at position 2
+    for (i = 0; i < items_arr.length; i++)
+    {
+      return_arr.push([items_arr[i],  $("#" + items_arr[i]).find("input").val()]);
+    }
+
+    var item_info = " ";
+    //through through the constructed return arr, and construct a string out of the array
+    for (i = 0; i < return_arr.length; i++)
+    {
+      item_info += "["
+      for (j = 0; j < return_arr[i].length; j++)
+      {
+        item_info += return_arr[i][j].toString();
+
+        if (j < (return_arr[i].length - 1))
+        {
+          item_info += ",";
+        }
+      }
+
+      item_info += "]"
+
+      if (i < (return_arr.length - 1))
+      {
+        item_info += ",";
+      }
+    }
+
+    //writes the itme_info string to the input with
+    $("#item_info").val(item_info);
+    return_arr = [];
+  }
+  </script>
 </head>
 
 <body>
@@ -19,30 +126,36 @@
   </div>
 
   <h1>Add Sales Record</h1>
-
-  <form id="addSalesForm" action="/SalesRecordAdded" method="post">
+  <fieldset>
+    <legend>Sales Information</legend>
 
     <fieldset>
-      <legend>Sales Information</legend>
-      <p><label for="itemID">Item ID:</label>
-        <select name="itemID" id="itemID">
-          <%- options %>
-        </select>
+      <legend>Select Item(s)</legend>
+      <p><label for="item_search">Item Search:</label>
+        <input type="text" name="item_search" id="item_search"/>
+        <button name="search_btn" id="search_btn">Search</button>
       </p>
 
-      <p><label for="salesDate">Sales Date:</label>
-        <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
-      </p>
 
-      <p><label for="itemQuantity">Quantity:</label>
-        <input required="required" type="number" name="itemQuantity" id="itemQuantity" min="1"/>  <!-- Quantity must be greater than 1 -->
-      </p>
+      <p id="items"></p>
     </fieldset>
 
-    <input type="submit" value="Submit" class="formBtn"/>
-    <input type="reset" value="Reset Form" class="formBtn" />
+      <br/>
 
-  </form>
+      <div id="item_selection">
+      </div>
+
+      <form id="addSalesForm" action="/SalesRecordAdded" method="post" onsubmit="collect_item_data()">
+        <p><label for="salesDate">Sales Date:</label>
+          <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
+        </p>      
+
+
+        <input type="text" hidden id="item_info" name="item_info" value=" "/>
+        <input type="submit" value="Submit" />
+        <input type="reset" value="Reset Form" />
+      </form>
+</fieldset>
 
   <br />
   <div id="footer">
