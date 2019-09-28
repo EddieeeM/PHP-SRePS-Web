@@ -5,6 +5,25 @@ body {
   font-family: sans-serif;
   /* Photo by Sarah Dorweiler on Unsplash */
 }
+
+* {font-family: calabri;
+}
+
+h1, h2, h3 {font-family: arial, sans-serif;}
+
+h1 {
+	color: #007FB8;
+	font-family: Segoe UI Semilight, Geneva, sans-serif;
+}
+
+p {
+font-family:Verdana, Geneva, sans-serif;
+}
+
+legend{
+  font-family:Trebuchet MS, Verdana, Geneva, sans-serif;
+}
+
 /* Navbar container */
 .navbar {
   overflow: hidden;
@@ -14,6 +33,7 @@ body {
 
 /* Links inside the navbar */
 .navbar a {
+  font-family:Verdana, Geneva, sans-serif;
   float: left;
   font-size: 16px;
   color: white;
@@ -36,7 +56,7 @@ body {
   color: white;
   padding: 14px 16px;
   background-color: inherit;
-  font-family: inherit; /* Important for vertical align on mobile phones */
+  font-family:Verdana, Geneva, sans-serif;
   margin: 0; /* Important for vertical align on mobile phones */
 }
 
@@ -74,6 +94,64 @@ body {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+/* ----------------------------------------------- */
+/* FORM CSS */
+
+input, select{
+  border:2px solid #2980B9;
+  padding:.5rem;
+  font-size:14px;
+  border-radius:5px;
+}
+
+.formBtn{
+  border:0;
+  background:#007FB8;
+  padding:.5rem;
+  color:white;
+  margin:1rem 5px;
+  width:auto;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:0.5s background ease;
+  font-family:Verdana, Geneva, sans-serif;
+}
+
+.formBtn:hover{
+  background:#f9f9f9;
+  color: #007FB8;
+}
+
+fieldset {
+  border:2px solid #333;
+  border-style: solid;
+  padding:1rem;
+  border-radius:5px;
+}
+
+fieldset legend {
+  font-size: 20px;
+}
+
+form label {
+  font-family:Verdana, Geneva, sans-serif;
+  font-weight: bold;
+}
+
+p input {
+  font-family:Verdana, Geneva, sans-serif;
+
+}
+
+select, option {
+  font-family:Verdana, Geneva, sans-serif;
+}
+
+
+/* FORM CSS */
+/* ----------------------------------------------- */
+
 
 
 
