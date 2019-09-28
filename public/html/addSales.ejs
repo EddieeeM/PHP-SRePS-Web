@@ -136,6 +136,7 @@
         <button name="search_btn" id="search_btn">Search</button>
       </p>
 
+
       <p id="items"></p>
     </fieldset>
 
@@ -147,7 +148,8 @@
       <form id="addSalesForm" action="/SalesRecordAdded" method="post" onsubmit="collect_item_data()">
         <p><label for="salesDate">Sales Date:</label>
           <input required="required" type="date" value="YYYY-MM-DD" name="salesDate" id="salesDate" /> <!-- TODO: Should the default date be today? -->
-        </p>
+        </p>      
+
 
         <input type="text" hidden id="item_info" name="item_info" value=" "/>
         <input type="submit" value="Submit" />
