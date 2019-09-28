@@ -54,8 +54,8 @@
             <td><%= SalesData[i - 1].Sale_ID %></td>
             <td><%= SalesData[i - 1].Sale_Date %></td>
             <td><%= items_string %></td>
-            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
-            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
+            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Edit Sales Record</a></td>
+            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Delete Sales Record</a></td>
           </tr>
           <%
           items_string = "";
