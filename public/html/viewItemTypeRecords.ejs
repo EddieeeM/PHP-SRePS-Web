@@ -6,13 +6,11 @@
   <title>Sales Manager</title>
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
-
-  <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
-	<!-- Include Header element -->
+  <!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
   <h1>Item Types</h1>
 
@@ -35,21 +33,21 @@
     <!-- If there is table data - print it out -->
     <% if(ItemData.length) {
       <!-- Create table entry for each observation -->
-      for(var i = 0; i < ItemData.length;i++)
+      for(var i = 0; i < ItemData.length; i++)
       { %>
         <tr>
           <td><%= ItemData[i].itmType_ID %></td>
           <td><%= ItemData[i].item_Type %></td>
-          <td><a href='/EditItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Edit Item Type</a></td>
-          <td><a href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>
+          <td class="td-button"><a class="general-button" href='/EditItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Edit Item Type</a></td>
+          <td class="td-button"><a class="general-button" href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>
         </tr>
     <% }
     }
     <!-- Else there is no table data -->
     else { %>
       <tr>
-      	<!-- Alert the user -->
-        <td colspan="2">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+        <!-- Alert the user -->
+        <td colspan="4">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>
