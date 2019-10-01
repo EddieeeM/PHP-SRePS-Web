@@ -55,13 +55,10 @@
           }
 
           %>
-
-          <script type="text/javascript">alert("1")</script>
-          
+                  
           <tr>
             <td><%= SalesData[i - 1].Sale_ID %></td>
             <td><%= SalesData[i - 1].Sale_Date %></td>
-            console.log(%= SalesData[i - 1].Sale_Date %)
             <td><%= items_string %></td>
             <td class="td-button"><a class="general-button" href="/EditSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Edit</a></td>
             <td class="td-button"><a class="general-button" href="/DeleteSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Delete</a></td>
