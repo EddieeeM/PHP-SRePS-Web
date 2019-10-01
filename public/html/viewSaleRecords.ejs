@@ -78,7 +78,11 @@
 
         if (i == (SalesData.length - 1))
         {
-          items_string += "Item ID: " + SalesData[i].Item_ID + ", Item Name: " + SalesData[i].Item_Name + ", Quantity: " + SalesData[i].Quantity;
+          if (items_string.length == 0)
+          {
+            items_string += "Item ID: " + SalesData[i].Item_ID + ", Item Name: " + SalesData[i].Item_Name + ", Quantity: " + SalesData[i].Quantity;
+          }
+          
           %>
 
           <tr>
