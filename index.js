@@ -3,8 +3,12 @@
 const http = require('http');
 const fileSystem = require('fs');
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const HTMLParser = require('node-html-parser');
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+const localStrategy = require('passport-local').Strategy;
 
 //creates express app
 const app = express();
@@ -17,6 +21,14 @@ const mysql = require("./scripts/Create_Script.js");
 //needed for getting form data
 const bodyParser = require('body-parser')
 const middlewares = [bodyParser.urlencoded()]
+
+//Express Session Packages
+app.use(session({
+  secret: "secret", 
+  resave: true, 
+  saveUninitialized: true
+}));
+
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
@@ -37,6 +49,84 @@ app.get("/", function(req, res)
 {
   res.render(path.join(__dirname + static_path + "index"));
 });
+
+//User Registration
+app.get("/Register", function(req, res){
+  res.render(path.join(__dirname + static_path + "Register"));
+});
+
+//Registration Script
+app.post("/RegisteredUser", function(req, res){
+
+  res.render(path.join(__dirname + static_path + "RegisteredUser"));
+
+  // await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + req.body.typeName + "');").then(result => {
+  //   if (result)
+  //   {
+  //     res.render(path.join(__dirname + static_path + "userAdded"), {name: req.body.User_ID});
+  //   }
+  // });
+
+});
+
+//User Login
+app.get("/Login", function(req, res){
+  
+  res.render(path.join(__dirname + static_path + "Login"));
+
+});
+
+//Login Script
+app.post("/LoggingIn", function(req, res){
+
+  var connection = mysql.createConnection({
+    multipleStatements: true,
+    host     : 'localhost',
+	  user     : 'root',
+    password : '',
+    port: 3306,
+	  database : 'peoplehealth'
+  });
+
+  var username = request.body.Username;
+  var password = request.body.Password;
+
+  //Checks if username and password is entered before running script
+  if (username && password) 
+  {
+    connection.query('SELECT * FROM user_logins WHERE username = ? AND password = ?', [username, password], function(error, results, fields) {
+      if (results.length > 0) 
+      {
+        //Checks if the user is logged in, will redirect to home page if true
+				request.session.loggedin = true;
+				request.session.username = username;
+				response.redirect('/');
+      } 
+      else 
+      {
+				response.send('Incorrect Username and/or Password!');
+			}			
+			response.end();
+		});
+  };
+
+  // module.exports = function(passport) {
+  //   passport.serializeUser(function(user, done){
+  //     done(null, user.id);
+  //   });
+  // }
+
+  // passport.deserializeUser(function(id, done){
+  //   await mysql.selectData("SELECT * FROM user_logins WHERE id = ? ", [id], 
+  //   function (err, rows) {
+  //     done(err, rows[0]);
+  //   });
+  // })
+
+  // await mysql.selectData("SELECT * FROM user_logins ORDER BY user_logins.User_ID").then(result => {
+
+  // })
+})
 
 app.get("/AddItemType", function(req, res)
 {
