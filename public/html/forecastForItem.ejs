@@ -12,25 +12,25 @@
 
   </head>
 
-  <body>
-    <h1>Item <%=item_id %> Details</h1>
-    <p>Name: <%=name %></p>
-    <p>Price: $<%=price %></p>
+  <body class='iframe_layout'>
+      <h1>Item <%=item_id %> Details</h1>
+      <p>Name: <%=name %></p>
+      <p>Price: $<%=price %></p>
 
-    <h2>Past Sales</h2>
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Quantity</th>
-      </tr>
+      <h2>Past Sales</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Quantity</th>
+        </tr>
 
-      <%- data %>
-    </table>
+        <%- data %>
+      </table>
 
-    <h2>Predicted Sales</h2>
-    <p><%=forecast %> Items</p>
+      <h2>Predicted Sales</h2>
+      <p><%=forecast %> Items</p>
 
-    <img src=<%=graph %> />
+      <img class='graph_img' src=<%=graph %> />
 
   </body>
 </html>

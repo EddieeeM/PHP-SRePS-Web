@@ -35,7 +35,7 @@ iframe
 {
   height: 100%;
   width: 100%;
-  
+
   display: block;
 }
 
@@ -257,6 +257,17 @@ tr:nth-child(odd) {
 /* Hover white over current row */
 tr:hover {
   background-color: white;
+}
+
+.iframe_layout
+{
+  margin: 0px;
+  padding: 0px;
+}
+
+.graph_img
+{
+  width: 100%;
 }
 
 /* End of MANAGE SALES, VIEW SALES RECORDS CSS */
