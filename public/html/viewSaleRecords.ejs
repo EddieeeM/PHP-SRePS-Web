@@ -14,8 +14,8 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Sales Records</h1>
-
+  <h1>Sales</h1>
+  
   <!-- Table to display Sales Record Data -->
   <table class="table table-hover table-bordered">
 
@@ -35,26 +35,33 @@
 
     <!-- If there is table data - print it out -->
     <% if(SalesData.length) {
+
       var sales_id = SalesData[0].Sale_ID;
       var items_string = "";
+      console.log(SalesData);
+
       <!-- Create table entry for each observation -->
-      for(var i = 0; i < SalesData.length;i++)
+      for(var i = 0; i < SalesData.length; i++)
       {
         if (sales_id != SalesData[i].Sale_ID)
         {
           sales_id = SalesData[i].Sale_ID;
-          if (items_string.length == 0)
+
+          if (items_string.length == 0) 
           {
-            items_string += "Item ID: " + SalesData[i - 1].Item_ID + ", Item Name: " + SalesData[i - 1].Item_Name + ", Quantity: " + SalesData[i - 1].Quantity;
+            items_string += "Item ID: "     + SalesData[i - 1].Item_ID + 
+                            ", Item Name: " + SalesData[i - 1].Item_Name + 
+                            ", Quantity: "  + SalesData[i - 1].Quantity;
           }
 
           %>
+                  
           <tr>
             <td><%= SalesData[i - 1].Sale_ID %></td>
             <td><%= SalesData[i - 1].Sale_Date %></td>
             <td><%= items_string %></td>
-            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Edit Sales Record</a></td>
-            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Delete Sales Record</a></td>
+            <td class="td-button"><a class="general-button" href="/EditSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Edit</a></td>
+            <td class="td-button"><a class="general-button" href="/DeleteSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Delete</a></td>
           </tr>
           <%
           items_string = "";
@@ -77,12 +84,13 @@
           }
           
           %>
+
           <tr>
             <td><%= SalesData[i].Sale_ID %></td>
             <td><%= SalesData[i].Sale_Date %></td>
             <td><%= items_string %></td>
-            <td><a href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit Sales Record</a></td>
-            <td><a href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete Sales Record</a></td>
+            <td class="td-button"><a class="general-button" href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit</a></td>
+            <td class="td-button"><a class="general-button" href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete</a></td>
           </tr>
           <%
         }
@@ -92,7 +100,7 @@
     else { %>
       <tr>
       	<!-- Alert the user -->
-        <td colspan="4">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
+        <td colspan="5">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
       </tr>
     <% }
     %>

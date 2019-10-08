@@ -1,34 +1,29 @@
+/*-----------------------------------------------------------------*/
+/*-- GENERAL STYLE ------------------------------------------------*/
+* {
+  font-family: Calabri;
+}
+
 body {
   margin-left: 15em;
   margin-right: 15em;
   background-image: url("images/background.jpg");
   font-family: sans-serif;
-  /* Photo by Sarah Dorweiler on Unsplash */
-}
-
-* {font-family: calabri;
-}
-
-h1, h2, h3 {font-family: arial, sans-serif;}
-
-h1 {
-	color: #007FB8;
-	font-family: Segoe UI Semilight, Geneva, sans-serif;
 }
 
 p {
-font-family:Verdana, Geneva, sans-serif;
+  font-family:Verdana, Geneva, sans-serif;
 }
 
-legend{
-  font-family:Trebuchet MS, Verdana, Geneva, sans-serif;
+.iframe_layout
+{
+  margin: 0px;
+  padding: 0px;
 }
 
-/* Navbar container */
-.navbar {
-  overflow: hidden;
-  background-color: #333;
-  font-family: Helvetica;
+.graph_img
+{
+  width: 100%;
 }
 
 iframe
@@ -45,9 +40,27 @@ iframe
   width: 100%;
 }
 
+
+/* END OF GENERAL STYLE -------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+
+
+
+/*-----------------------------------------------------------------*/
+/*-- NAV BAR STYLE ------------------------------------------------*/
+/* Navbar container */
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+  font-family: Helvetica;
+  border: solid  #007FB8;
+  border-radius: 3px;
+}
+
 /* Links inside the navbar */
 .navbar a {
-  font-family:Verdana, Geneva, sans-serif;
+  font-family: Verdana, Geneva, sans-serif;
   float: left;
   font-size: 16px;
   color: white;
@@ -70,7 +83,7 @@ iframe
   color: white;
   padding: 14px 16px;
   background-color: inherit;
-  font-family:Verdana, Geneva, sans-serif;
+  font-family: Verdana, Geneva, sans-serif;
   margin: 0; /* Important for vertical align on mobile phones */
 }
 
@@ -83,7 +96,7 @@ iframe
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f9f9f9;
+  background-color: #F9F9F9;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -101,115 +114,58 @@ iframe
 
 /* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
-  background-color: #ddd;
+  background-color: #DDDDDD;
 }
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
-/* ----------------------------------------------- */
-/* FORM CSS */
-
-input, select{
-  border:2px solid #2980B9;
-  padding:.5rem;
-  font-size:14px;
-  border-radius:5px;
-}
-
-.formBtn{
-  border:0;
-  background:#007FB8;
-  padding:.5rem;
-  color:white;
-  margin:0.25rem 5px;
-  width:auto;
-  text-transform:uppercase;
-  cursor:pointer;
-  transition:0.5s background ease;
-  font-family:Verdana, Geneva, sans-serif;
-}
-
-.formBtn:hover{
-  background:#f9f9f9;
-  color: #007FB8;
-}
-
-fieldset {
-  border:2px solid #333;
-  border-style: solid;
-  padding:1rem;
-  border-radius:5px;
-}
-
-fieldset legend {
-  font-size: 20px;
-}
-
-label {
-  font-family:Verdana, Geneva, sans-serif;
-  font-weight: bold;
-}
-
-p input {
-  font-family:Verdana, Geneva, sans-serif;
-
-}
-
-select, option {
-  font-family:Verdana, Geneva, sans-serif;
-}
-
-
-/* FORM CSS */
-/* ----------------------------------------------- */
+/* END OF NAV BAR STYLE                                            */
+/*-----------------------------------------------------------------*/
 
 
 
 
-/* ----------------------------------------------- */
-/* Only applies to MANAGE SALES, VIEW SALES RECORDS*/
-/* PLEASE LEAVE THESE MARKERS  */
 
-/* Align text in main information area */
-.span-info-box {
-  text-align: center;
-}
-
-/* Allows each span in the manage sales area to take up 1/3rd of the screen */
-.span-third {
-  width:33%;
-  display:inline-block;
+/*-----------------------------------------------------------------*/
+/* MANAGEMENT MENU STYLE ------------------------------------------*/
+/* Make each span take up 1/3rd of the width of the screen */
+.span-half {
+  width: 49.7%;
+  display: inline-block;
   text-align: center;
 }
 
 /* Button styling - Links / Visited Links */
-.sales-management-button:link, .sales-management-button:visited {
-  background-color: white;
-  color: black;
-  padding: 14px 25px;
-  text-align: center;
+.general-button:link, .general-button:visited {
+  border: 0;
+  background: #007FB8;
+  padding: 7px 10px 7px 10px;
+  color: white;
   text-decoration: none;
-  display: inline-block;
-  border: solid;
-  border-color: black;
+  cursor: pointer;
+  transition: 0.5s background ease;
+  font-family: Verdana, Geneva, sans-serif;
+  border-radius: 8px;
+
 }
 
+
 /* Button styling - Hover / Active */
-.sales-management-button:hover, .sales-management-button:active {
-  background-color: grey;
+.general-button:hover, .general-button:active {
+  background: #F9F9F9;
+  color: #007FB8;
 }
 
 /* Sections of text in squares*/
 .content-section {
   background: #FAFAFA;
   padding: 10px 20px;
-  border: 1px solid #dddddd;
-  border-radius: 3px;
   margin-bottom: 20px;
-  border-color: #263037;
+  border: 2px solid;
+  border-radius: 3px;
+  border-color: #333333;
 }
 
 /* Sections of text in squares*/
@@ -219,14 +175,25 @@ select, option {
 }
 
 /* Sections of text in squares*/
-.article-metadata {
-  padding-bottom: 1px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
+.article-title {
+  font-size: 1.5em;
+  border-bottom: 1px solid #E3E3E3;
 }
 
+/* Sections of text in squares*/
+.article-title-sub {
+  font-weight: bold;
+  border-bottom: 1px solid #E3E3E3
+}
+/* END OF MANAGEMENT MENU STYLE                                    */
+/*-----------------------------------------------------------------*/
 
-/* Table styling */
+
+
+
+
+/*-----------------------------------------------------------------*/
+/* TABLE STYLE ----------------------------------------------------*/
 table {
   border-collapse: collapse;
   width: 100%;
@@ -234,42 +201,92 @@ table {
 
 /* Header colouring */
 th {
+/*  background: #36454F;
+  color: white;*/
   background: #36454F;
   color: white;
+  white-space:nowrap;
 }
 
 /* Border / Colouring for general table */
 td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
+  border: 1px solid #DDDDDD;
   padding: 8px;
+}
+
+.td-button {
+   text-align: center;
 }
 
 /* Zebra stripes */
 tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: #DDDDDD;
 }
-/* Zebra stripes */
 tr:nth-child(odd) {
-  background-color: #d3d3d3 ;
+  background-color: #D3D3D3 ;
 }
 
-/* Hover white over current row */
+/* White hover over current row */
 tr:hover {
   background-color: white;
 }
+/* END OF TABLE STYLE                                              */
+/*-----------------------------------------------------------------*/
 
-.iframe_layout
-{
-  margin: 0px;
-  padding: 0px;
+
+
+
+
+/*-----------------------------------------------------------------*/
+/* FORM STYLE -----------------------------------------------------*/
+input, select{
+  border: 2px solid #2980B9;
+  padding: 0.5rem;
+  font-size: 14px;
+  border-radius: 5px;
 }
 
-.graph_img
-{
-  width: 100%;
+.formBtn{
+  border: 0;
+  background: #007FB8;
+  padding: 0.5rem;
+  color: white;
+  margin: 0.25rem 5px;
+  width: auto;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.5s background ease;
+  font-family: Verdana, Geneva, sans-serif;
 }
 
-/* End of MANAGE SALES, VIEW SALES RECORDS CSS */
-/* PLEASE LEAVE THESE MARKERS  */
-/* ------------------------------------------- */
+.formBtn:hover{
+  background: #F9F9F9;
+  color: #007FB8;
+}
+
+fieldset {
+  border: 2px solid #333;
+  border-style: solid;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+fieldset legend {
+  font-size: 20px;
+}
+
+label {
+  font-family: Verdana, Geneva, sans-serif;
+  font-weight: bold;
+}
+
+p input {
+  font-family: Verdana, Geneva, sans-serif;
+
+}
+
+select, option {
+  font-family: Verdana, Geneva, sans-serif;
+}
+/* END OF FORM STYLE ----------------------------------------------*/
+/*-----------------------------------------------------------------*/
