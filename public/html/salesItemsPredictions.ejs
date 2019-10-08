@@ -7,6 +7,14 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
 
+  <script>
+    function show_prediction(item_id)
+    {
+      $("#prediction_frame").show();
+      $("#display_frame").attr("src", "./ForecastSales?itemID=" + item_id);
+    }
+  </script>
+
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
@@ -26,8 +34,6 @@
         <th scope="col">Item Name</th>
         <th scope="col">Item Price</th>
         <th scope="col">Item Type</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Delete</th>
         <th scope='col'>Sales Data</th>
       </tr>
     </thead>
@@ -45,9 +51,7 @@
           <td><%= ItemData[i].Item_Name %></td>
           <td>$ <%= ItemData[i].Price %></td>
           <td><%= ItemData[i].item_Type %></td>
-          <td><a href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
-          <td><a href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete Item</a></td>
-          <td><a href='/ForecastSales?itemID=<%= ItemData[i].itmType_ID %>'>View Sales/Prediction</a></td>
+          <td><button onclick='show_prediction(<%= ItemData[i].Item_ID %>)'>View Predictions</button></td>
         </tr>
     <% }
     }
@@ -61,6 +65,10 @@
     %>
     </tbody>
   </table>
+
+  <div id='prediction_frame' hidden>
+    <iframe id='display_frame' src=''></iframe>
+  </div>
 
   <!-- Include Footer element -->
   <br />

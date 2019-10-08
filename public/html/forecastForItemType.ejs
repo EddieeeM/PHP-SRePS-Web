@@ -13,13 +13,14 @@
   </head>
 
   <body>
-    <h1>Item <%=item_id %> Details</h1>
+    <h1>Item <%=item_type_id %> Details</h1>
     <p>Name: <%=name %></p>
     <p>Price: $<%=price %></p>
 
     <h2>Past Sales</h2>
     <table>
       <tr>
+        <th>Item</th>
         <th>Date</th>
         <th>Quantity</th>
       </tr>
@@ -31,6 +32,5 @@
     <p><%=forecast %> Items</p>
 
     <img src=<%=graph %> />
-
   </body>
 </html>
