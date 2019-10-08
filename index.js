@@ -13,6 +13,7 @@ app.set('view engine', 'ejs');
 
 //gets seperate js file for sql commands, etc
 const mysql = require("./scripts/Create_Script.js");
+const forecast = require("./scripts/forecast_sales.js");
 
 //needed for getting form data
 const bodyParser = require('body-parser')
@@ -702,6 +703,30 @@ app.post("/SalesEdited", async function(req, res)
       res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
     });
   });
+});
+
+app.get("/PredictSales", async function(req, res)
+{
+  var item_id = req.query.itemID;
+  var data = [];
+  var table_string = "";
+
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+      item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+      var entry;
+
+      result.forEach(function(element)
+      {
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
+        table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+      });
+
+      res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data)});
+
+  });
+
+
 });
 
 const server = http.createServer(app);
