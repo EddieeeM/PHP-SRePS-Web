@@ -434,15 +434,18 @@ app.get("/DeleteItem", async function(req, res)
 app.post("/ItemDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
-  }
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID WHERE s_i.Item_ID = '" + req.post.itemID + "';").then(result => {
+    if (result)
+    {
+      mysql.selectData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(itemResult =>
+      {
+        res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
+      });
+    }
   });
 });
 
-app.post("/DeleteItemType", async function(req, res)
+app.get("/DeleteItemType", async function(req, res)
 {
     var itemTypeID = req.query.itemTypeID;
 
@@ -455,7 +458,7 @@ app.post("/DeleteItemType", async function(req, res)
         //renders ejs doc as html, replace document variables with options for the select field
       });
 
-      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: item_obj.itemTypeID, itemTypeIDValue: "value = '" + item_obj.itemTypeID + "'",
+      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: item_obj.itmType_ID, itemTypeIDValue: "value = '" + item_obj.itmType_ID + "'",
       itemTypeName: item_obj.item_Type});
     });
 });
@@ -463,11 +466,17 @@ app.post("/DeleteItemType", async function(req, res)
 app.post("/ItemTypeDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemID});
-  }
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID JOIN item i ON s_i.Item_ID = i.Item_ID WHERE i.itmType_ID = '" + req.body.itemTypeID + "';").then(result => {
+    if (result)
+    {
+      mysql.selectData("DELETE FROM item WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+      {
+        mysql.selectData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+        {
+          res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemTypeID});
+        });
+      });
+    }
   });
 });
 
