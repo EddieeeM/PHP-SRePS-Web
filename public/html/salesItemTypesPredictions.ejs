@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Sales Manager</title>
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+
+  <script>
+    function show_prediction(item_id)
+    {
+      $("#prediction_frame").show();
+      $("#display_frame").attr("src", "./ForecastItemType?itemType=" + item_id);
+    }
+  </script>
+
+  <!-- All CSS for this webpage can be found in a section in the stylesheet -->
+  <link href="html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+
+<body>
+	<!-- Include Header element -->
+  <div class="navbar" id="navbar"></div>
+  <h1>Item Types</h1>
+
+  <!-- Table to display Sales Record Data -->
+  <table class="table table-hover table-bordered">
+
+    <!-- Hard coded table headers -->
+    <thead>
+      <tr>
+        <th scope="col">Item Type ID</th>
+        <th scope="col">Item Type Name</th>
+
+        <th scope='col'>Sales Data</th>
+      </tr>
+    </thead>
+
+    <!-- Table body -->
+    <tbody>
+
+    <!-- If there is table data - print it out -->
+    <% if(ItemData.length) {
+      <!-- Create table entry for each observation -->
+      for(var i = 0; i < ItemData.length;i++)
+      { %>
+        <tr>
+          <td><%= ItemData[i].itmType_ID %></td>
+          <td><%= ItemData[i].item_Type %></td>
+          <td><button onclick='show_prediction(<%= ItemData[i].itmType_ID %>)'>View Predictions</button></td>
+        </tr>
+    <% }
+    }
+    <!-- Else there is no table data -->
+    else { %>
+      <tr>
+      	<!-- Alert the user -->
+        <td colspan="2">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+      </tr>
+    <% }
+    %>
+    </tbody>
+  </table>
+
+  <div id='prediction_frame' hidden>
+    <iframe id='display_frame' src=''></iframe>
+  </div>
+
+  <!-- Include Footer element -->
+  <br />
+  <div id="footer"> </div>
+</body>
+</html>
