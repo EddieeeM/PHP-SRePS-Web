@@ -29,6 +29,9 @@
         <th scope="col">Edit</th>
         <th scope="col">Delete</th>
         <th scope='col'>Sales Data</th>
+        <th scope='col'>Edit Item</th>
+        <th scope='col'>Delete Item</th>
+
       </tr>
     </thead>
 
@@ -45,14 +48,14 @@
           <td><%= ItemData[i].Item_Name %></td>
           <td><%= ItemData[i].Price %></td>
           <td><%= ItemData[i].item_Type %></td>
-<<<<<<< HEAD
+
           <td><a href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
           <td><a href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete Item</a></td>
           <td><a href='/ForecastSales?itemID=<%= ItemData[i].itmType_ID %>'>View Sales/Prediction</a></td>
-=======
+
           <td class="td-button"><a class="general-button" href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
           <td class="td-button"><a class="general-button" href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete Item</a></td>
->>>>>>> master
+
         </tr>
     <% }
     }

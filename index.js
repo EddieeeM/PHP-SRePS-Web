@@ -75,7 +75,7 @@ app.get("/AddItem", async function(req, res)
 app.post("/ItemAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID) VALUES ('" + req.body.itemName + "'," + req.body.itemPrice + "," + req.body.itemType + ");").then(result => {
+  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID, stockQuantity) VALUES ('" + req.body.itemName + "'," + req.body.itemPrice + "," + req.body.itemType + "," + req.body.stockQuantity + ");").then(result => {
   if (result)
   {
     res.render(path.join(__dirname + static_path + "itemAdded"), {name: req.body.itemName});
