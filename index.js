@@ -17,6 +17,7 @@ app.set('view engine', 'ejs');
 
 //gets seperate js file for sql commands, etc
 const mysql = require("./scripts/Create_Script.js");
+const forecast = require("./scripts/forecast_sales.js");
 
 //needed for getting form data
 const bodyParser = require('body-parser')
@@ -523,15 +524,18 @@ app.get("/DeleteItem", async function(req, res)
 app.post("/ItemDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
-  }
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID WHERE s_i.Item_ID = '" + req.post.itemID + "';").then(result => {
+    if (result)
+    {
+      mysql.selectData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(itemResult =>
+      {
+        res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
+      });
+    }
   });
 });
 
-app.post("/DeleteItemType", async function(req, res)
+app.get("/DeleteItemType", async function(req, res)
 {
     var itemTypeID = req.query.itemTypeID;
 
@@ -544,7 +548,7 @@ app.post("/DeleteItemType", async function(req, res)
         //renders ejs doc as html, replace document variables with options for the select field
       });
 
-      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: item_obj.itemTypeID, itemTypeIDValue: "value = '" + item_obj.itemTypeID + "'",
+      res.render(path.join(__dirname + static_path + "deleteItemType"), {itemTypeID: item_obj.itmType_ID, itemTypeIDValue: "value = '" + item_obj.itmType_ID + "'",
       itemTypeName: item_obj.item_Type});
     });
 });
@@ -552,11 +556,17 @@ app.post("/DeleteItemType", async function(req, res)
 app.post("/ItemTypeDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemID + "');").then(result => {
-  if (result)
-  {
-    res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemID});
-  }
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID JOIN item i ON s_i.Item_ID = i.Item_ID WHERE i.itmType_ID = '" + req.body.itemTypeID + "';").then(result => {
+    if (result)
+    {
+      mysql.selectData("DELETE FROM item WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+      {
+        mysql.selectData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+        {
+          res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemTypeID});
+        });
+      });
+    }
   });
 });
 
@@ -791,6 +801,73 @@ app.post("/SalesEdited", async function(req, res)
       //page is then rendered
       res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
     });
+  });
+});
+
+app.get("/ForecastSales", async function(req, res)
+{
+  var item_id = req.query.itemID;
+  var data = [];
+  var table_string = "";
+
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+      item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+      var entry;
+
+      result.forEach(function(element)
+      {
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
+        table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+      });
+
+      res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+
+  });
+});
+
+app.get("/ForecastItemType", async function(req, res)
+{
+  var item_type_id = req.query.itemType;
+  var data = [];
+  var table_string = "";
+
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+      item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+      var entry;
+
+      result.forEach(function(element)
+      {
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
+        table_string += "<tr><td>" + element.Item_Name + "</td><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+      });
+
+      res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+
+  });
+});
+
+// View Items page
+app.get("/SalesItemsPredictions", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "salesItemsPredictions"), {ItemData: result});
+  });
+});
+
+app.get("/SalesItemTypePredictions", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM item_types").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "salesItemTypesPredictions"), {ItemData: result});
   });
 });
 

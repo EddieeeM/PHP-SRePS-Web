@@ -33,6 +33,7 @@
     "passport-http": "*",
     "passport-local": "*",
     "tedious": "^6.3.0",
+    "timeseries-analysis": "^1.0.12",
     "url": "^0.11.0"
   }
 }
