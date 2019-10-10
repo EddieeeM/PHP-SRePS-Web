@@ -7,13 +7,7 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
 
-  <script>
-    function show_prediction(item_id)
-    {
-      $("#prediction_frame").show();
-      $("#display_frame").attr("src", "./ForecastItemType?itemType=" + item_id);
-    }
-  </script>
+  <script src="/js/form_transformation.js"></script>
 
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
@@ -32,7 +26,6 @@
       <tr>
         <th scope="col">Item Type ID</th>
         <th scope="col">Item Type Name</th>
-
         <th scope='col'>Sales Data</th>
       </tr>
     </thead>
@@ -48,7 +41,7 @@
         <tr>
           <td><%= ItemData[i].itmType_ID %></td>
           <td><%= ItemData[i].item_Type %></td>
-          <td><button onclick='show_prediction(<%= ItemData[i].itmType_ID %>)'>View Predictions</button></td>
+          <td><button onclick='show_prediction(<%= ItemData[i].itmType_ID %>, "itemType", "ForecastItemType")'>View Predictions</button></td>
         </tr>
     <% }
     }

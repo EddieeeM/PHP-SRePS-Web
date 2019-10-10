@@ -10,15 +10,12 @@
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script src="/js/loadhtml.js"></script>
     <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+    <script src="/js/form_transformation.js"></script>
 
     <script>
     $( document ).ready(function()
     {
-      var url = window.location.href;
-      var get_vars = url.split("?")[1];
-      get_vars = url.split("&")
-
-      $("#downloadCSV").html("<a href='localhost:3001/DownloadCSV?startDate=" + get_vars[0].split("=")[1] + "&endDate=" + get_vars[1].split("=")[1] + "'>Download CSV Report</a>");
+      getCSVDownload();
     });
     </script>
   </head>
