@@ -57,17 +57,19 @@ app.get("/Register", function(req, res){
 });
 
 //Registration Script
-app.post("/RegisteredUser", function(req, res){
+app.post("/RegisterResult", async function(req, res){
 
-  res.render(path.join(__dirname + static_path + "RegisteredUser"));
-
-  // await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + req.body.typeName + "');").then(result => {
-  //   if (result)
-  //   {
-  //     res.render(path.join(__dirname + static_path + "userAdded"), {name: req.body.User_ID});
-  //   }
-  // });
-
+  res.render(path.join(__dirname + static_path + "RegisteredResult"));
+  await mysql.insertData("INSERT INTO users (FirstName, LastName, Email, Username, Password) VALUES ('" + req.body.FirstName + "', '" + req.body.LastName + "', '" + req.body.Email + "', '" + req.body.Username + "', '" + req.body.Password + "');").then(result => {
+    if (result)
+    {
+      res.render(path.join(__dirname + static_path + "RegisteredResult"), {Username: req.body.Username});
+    } else {
+      res.send('Please fill in all the fields!');
+      res.redirect('/Register');
+      res.end();
+    }
+  });
 });
 
 //User Login
@@ -78,38 +80,33 @@ app.get("/Login", function(req, res){
 });
 
 //Login Script
-app.post("/LoggingIn", function(req, res){
-
-  var connection = mysql.createConnection({
-    multipleStatements: true,
-    host     : 'localhost',
-	  user     : 'root',
-    password : '',
-    port: 3306,
-	  database : 'peoplehealth'
-  });
-
-  var username = request.body.Username;
-  var password = request.body.Password;
+app.post("/LoggingIn", async function(req, res){
+  var username = req.body.Username;
+  var password = req.body.Password;
 
   //Checks if username and password is entered before running script
   if (username && password) 
   {
-    connection.query('SELECT * FROM user_logins WHERE username = ? AND password = ?', [username, password], function(error, results, fields) {
+    await mysql.selectData("SELECT * FROM user_logins WHERE Username = '" + username + "' AND Password = '" + password + "'", [username, password], function(error, results, fields){
       if (results.length > 0) 
       {
         //Checks if the user is logged in, will redirect to home page if true
-				request.session.loggedin = true;
-				request.session.username = username;
-				response.redirect('/');
+				req.session.loggedin = true;
+        req.session.username = username;
+				res.redirect('/');
       } 
       else 
       {
-				response.send('Incorrect Username and/or Password!');
+				res.send('Incorrect Username and/or Password!');
 			}			
-			response.end();
-		});
+			res.end();
+    });
+  } else {
+    res.send('Please Enter Username and Password');
+    res.end();
   };
+
+  res.render(path.join(__dirname + static_path + "LoggingIn"), {Username: req.body.Username});
 
   // module.exports = function(passport) {
   //   passport.serializeUser(function(user, done){
@@ -118,7 +115,7 @@ app.post("/LoggingIn", function(req, res){
   // }
 
   // passport.deserializeUser(function(id, done){
-  //   await mysql.selectData("SELECT * FROM user_logins WHERE id = ? ", [id], 
+  //   await mysql.selectData("SELECT * FROM user_logins WHERE User_ID = '" + User_ID "'", [id], 
   //   function (err, rows) {
   //     done(err, rows[0]);
   //   });

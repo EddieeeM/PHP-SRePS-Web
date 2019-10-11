@@ -5,7 +5,7 @@
         <meta name="description" content="PHP-SRePS" />
         <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
         <meta name="author" content="Eddie Monserrate" />
-        <title>Login Form</title>
+        <title>Registered</title>
         
         <script src="/js/jquery-3.4.1.min.js"></script>
         <script src="/js/loadhtml.js"></script>
@@ -14,24 +14,15 @@
 
 	<body>
 		<div>        
-		<form action="/LoggingIn" method="POST">
             <fieldset>
-                <legend>Login Form</legend>
-                <p><label for="Username">Username</label>
-				    <input type="text" name="Username" id="Username" placeholder="Username" required />
-                </p>
-
-                <p><label for="Password">Password</label> 
-				    <input type="password" name="Password" id="Password" placeholder="Password" required />
-                </p>
-
-                <input type="submit" class="formBtn" />
+                <h1>Successfully Registered</h1>
+                <p>Name: <%= FirstName %></p>
                 
-                <a class="general-button" href="/register" class="button">New User</a>
+                <h2>As...</h2>
+                <p>User: <%= Username %></p>
+                
             </fieldset>
-        </form>
         </div>
-        
         <br />
         <div id="footer"></div>
 	</body>
