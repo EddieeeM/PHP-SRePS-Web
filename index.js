@@ -57,13 +57,13 @@ app.get("/Register", function(req, res){
 });
 
 //Registration Script
-app.post("/RegisterResult", async function(req, res){
+app.post("/RegisteredResult", async function(req, res){
 
-  res.render(path.join(__dirname + static_path + "RegisteredResult"));
   await mysql.insertData("INSERT INTO users (FirstName, LastName, Email, Username, Password) VALUES ('" + req.body.FirstName + "', '" + req.body.LastName + "', '" + req.body.Email + "', '" + req.body.Username + "', '" + req.body.Password + "');").then(result => {
     if (result)
     {
       res.render(path.join(__dirname + static_path + "RegisteredResult"), {Username: req.body.Username});
+      mysql.insertData("INSERT INTO user_logins (User_ID, UserName, Password) VALUES('" + res.insertid + "', '" + req.body.Username + "', '" + req.body.Password + "');");
     } else {
       res.send('Please fill in all the fields!');
       res.redirect('/Register');
@@ -88,15 +88,22 @@ app.post("/LoggingIn", async function(req, res){
   if (username && password) 
   {
     await mysql.selectData("SELECT * FROM user_logins WHERE Username = '" + username + "' AND Password = '" + password + "'", [username, password], function(error, results, fields){
-      if (results.length > 0) 
+      if (error){
+        res.error("Incorrect Username and/or Password!");
+        return done(error);
+      } 
+      else if (results.length > 0) 
       {
         //Checks if the user is logged in, will redirect to home page if true
 				req.session.loggedin = true;
         req.session.username = username;
-				res.redirect('/');
+        req.session.password = password;
+        res.redirect('/');
+        // res.render(path.join(__dirname + static_path + "/"));
       } 
-      else 
+      else
       {
+        //res.error("Incorrect Username and/or Password!");
 				res.send('Incorrect Username and/or Password!');
 			}			
 			res.end();
