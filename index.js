@@ -666,7 +666,7 @@ app.get("/ViewSaleRecords", async function(req, res)
 {
   // Querey database and wait for result response
   // Returns ALL sales records and passes in array
-  await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID").then(result => {
+  await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID ORDER BY sales.Sale_Date").then(result => {
 
     // Render view and pass result of query to be displayed
     res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
@@ -676,7 +676,7 @@ app.get("/ViewSaleRecords", async function(req, res)
 // -----------------------------------------------------------------------------------------
 app.get("/getItems", async function(req, res)
 {
-  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + req.query.searchString + "%'").then(result => {
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + req.query.searchString + "%' ORDER BY item.Item_Name ASC").then(result => {
     res.send(result);
   });
 });
