@@ -277,6 +277,7 @@ app.get("/DisplaySalesReport", async function(req, res)
 {
   var start_date = req.query.startDate;
   var end_date = req.query.endDate;
+  var prediction = req.query.displayPredictions;
 
   start_date = start_date + "-00";
 
@@ -293,9 +294,31 @@ app.get("/DisplaySalesReport", async function(req, res)
     await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
+        var data = [];
+        var entry;
+
+        result.forEach(function(element)
+        {
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
+        });
+
       result.forEach(function(element)
       {
-        output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+        output_string += "<tr><td>" + element.Sale_ID +
+        "</td><td>" + element.Quantity +
+        "</td><td>" + element.Item_ID +
+        "</td><td>" + element.Item_Name +
+        "</td><td>" + element.Sale_Date;
+
+        if (prediction == "true")
+        {
+          output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+        }
+        else
+        {
+          output_string += "</td></tr>";
+        }
       });
 
       if (output_string.length == 0)
@@ -326,10 +349,32 @@ app.get("/DisplaySalesReport", async function(req, res)
     await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
       start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
+      var data = [];
+      var entry;
+
       result.forEach(function(element)
       {
-        output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
       });
+
+      result.forEach(function(element)
+      {
+        output_string += "<tr><td>" + element.Sale_ID +
+        "</td><td>" + element.Quantity +
+        "</td><td>" + element.Item_ID +
+        "</td><td>" + element.Item_Name +
+        "</td><td>" + element.Sale_Date;
+      });
+
+      if (prediction == "true")
+      {
+        output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+      }
+      else
+      {
+        output_string += "</td></tr>";
+      }
 
       if (output_string.length == 0)
       {
