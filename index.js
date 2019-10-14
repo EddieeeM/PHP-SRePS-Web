@@ -16,8 +16,8 @@ const check = require('express-validator/check').check;
 const validationResult = require('express-validator/check').validationResult;
 
 //gets seperate js file for sql commands, etc
-const mysql = require("./scripts/Create_Script.js");
-const forecast = require("./scripts/forecast_sales.js");
+const mysql = require("./scripts/server/sql_script.js");
+const forecast = require("./scripts/server/forecast_sales.js");
 
 //needed for getting form data
 const bodyParser = require('body-parser')

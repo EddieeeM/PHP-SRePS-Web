@@ -1,6 +1,6 @@
 //TO RUN, type: mocha ./tests/test.js (assume your current file path is set at project root path)
 
-const mysql = require("../scripts/Create_Script.js");
+const mysql = require("../scripts/server/sql_script.js");
 
 var assert = require('assert');
 
