@@ -5,11 +5,15 @@ const fileSystem = require('fs');
 const express = require('express');
 const path = require('path');
 const HTMLParser = require('node-html-parser');
+var sanitizeHtml = require('sanitize-html');
 
 //creates express app
 const app = express();
-
+app.use(express.json())
 app.set('view engine', 'ejs');
+
+const check = require('express-validator/check').check;
+const validationResult = require('express-validator/check').validationResult;
 
 //gets seperate js file for sql commands, etc
 const mysql = require("./scripts/Create_Script.js");
@@ -47,10 +51,11 @@ app.get("/AddItemType", function(req, res)
 app.post("/ItemTypeAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + req.body.typeName + "');").then(result => {
+  var typeName = sanitizeHtml(req.body.typeName);
+  await mysql.insertData("INSERT INTO item_types (item_Type) VALUES ('" + typeName + "');").then(result => {
     if (result)
     {
-      res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: req.body.typeName});
+      res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: typeName});
     }
   });
 });
@@ -75,21 +80,28 @@ app.get("/AddItem", async function(req, res)
 app.post("/ItemAdded", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID, stockQuantity) VALUES ('" + req.body.itemName + "'," + req.body.itemPrice + "," + req.body.itemType + "," + req.body.stockQuantity + ");").then(result => {
+  var itemName = sanitizeHtml(req.body.itemName);
+  var itemPrice = sanitizeHtml(req.body.itemPrice);
+  var itemType = sanitizeHtml(req.body.itemType);
+  var stockQuantity = sanitizeHtml(req.body.stockQuantity);
+
+  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID, stockQuantity) VALUES ('" + itemName + "'," + itemPrice + "," + itemType + "," + stockQuantity + ");").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "itemAdded"), {name: req.body.itemName});
+    res.render(path.join(__dirname + static_path + "itemAdded"), {name: itemName});
   }
   });
 });
 
 app.post("/ItemDeleted", async function(req, res)
 {
+  var itemName = sanitizeHtml(req.body.itemName);
+  var itemID = sanitizeHtml(req.body.itemID);
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + req.body.itemID + "');").then(result => {
+  await mysql.insertData("DELETE FROM item WHERE Item_ID =  ('" + itemID + "');").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: req.body.itemName,itemID: req.body.itemID});
+    res.render(path.join(__dirname + static_path + "itemDeleted"), {name: itemName, itemID: itemID});
   }
   });
 });
@@ -101,10 +113,11 @@ app.get("/AddSalesRecord", async function(req, res)
 
 app.post("/SalesRecordAdded", async function(req, res)
 {
-  var item_quantity_arr = req.body.item_info;
+  var item_quantity_arr = sanitizeHtml(req.body.item_info);
+  var salesDate = sanitizeHtml(req.body.salesDate);
 
   //inserts master record
-  await mysql.selectData("INSERT INTO sales (Sale_Date) VALUES ('" + req.body.salesDate + "'); SELECT LAST_INSERT_ID() as insertid;").then(result => {
+  await mysql.selectData("INSERT INTO sales (Sale_Date) VALUES ('" + salesDate + "'); SELECT LAST_INSERT_ID() as insertid;").then(result => {
 
       var return_obj;
 
@@ -116,23 +129,28 @@ app.post("/SalesRecordAdded", async function(req, res)
 
       //the query has returned the last auto increment ID it assigned for the transaction, which is the ID for the sales entry
       var sales_id = return_obj[0].insertid;
+      sales_id = sanitizeHtml(sales_id);
+      var salesDate = sanitizeHtml(req.body.salesDate);
 
       //the item info is split into it's components
       //item info follow this structure: [item_id, quantity],[item_id, quantity],
-      req.body.item_info.split("]").forEach(function(element)
+      var item_info = sanitizeHtml(req.body.item_info);
+      item_info.split("]").forEach(function(element)
       {
         if (element.trim().length > 0)
         {
           var string = element.trim();
           //this string has the item_id and capacity, seperated by a comma
+          string = sanitizeHtml(string);
           string = string.split("[")[1];
+
           //inserts new record into sales_items
           mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + sales_id + "' ,'" + string.split(",")[0] + "', '" + string.split(",")[1] + "')");
         }
       });
 
       //page is renders with
-      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate});
+      res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: salesDate});
   });
 });
 
@@ -143,10 +161,10 @@ app.get("/SearchSalesRecord", async function(req, res)
 
 app.post("/ReturnSalesRecords", async function(req, res)
 {
-  var search_string = req.body.searchString;
-  var search_date = req.body.searchDate;
-  var start_date = req.body.startDate;
-  var end_date = req.body.endDate;
+  var search_string = sanitizeHtml(req.body.searchString);
+  var search_date = sanitizeHtml(req.body.searchDate);
+  var start_date = sanitizeHtml(req.body.startDate);
+  var end_date = sanitizeHtml(req.body.endDate);
 
   var output_string = "";
 
@@ -187,8 +205,8 @@ app.post("/ReturnSalesRecords", async function(req, res)
 
 app.get("/DownloadCSV", async function(req, res)
 {
-  var start_date = req.query.startDate;
-  var end_date = req.query.endDate;
+  var start_date = sanitizeHtml(req.query.startDate);
+  var end_date = sanitizeHtml(req.query.endDate);
 
   var output_string = "";
 
@@ -222,8 +240,8 @@ app.get("/DownloadCSV", async function(req, res)
   else
   {
     //waits for the response for database, then continues, utilizing the response string
-    var month = req.query.startDate.split("-")[1];
-    var year = req.query.startDate.split("-")[0];
+    var month = start_date.split("-")[1];
+    var year = start_date.split("-")[0];
     var month = parseInt(month) + 1;
 
     if (month < 10)
@@ -244,7 +262,7 @@ app.get("/DownloadCSV", async function(req, res)
       result.forEach(function(element)
       {
         output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
-          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';      });
+          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';});
 
       if (output_string.length == 0)
       {
@@ -275,8 +293,8 @@ app.get("/GenerateSalesReport", function(req, res)
 
 app.get("/DisplaySalesReport", async function(req, res)
 {
-  var start_date = req.query.startDate;
-  var end_date = req.query.endDate;
+  var start_date = sanitizeHtml(req.query.startDate);
+  var end_date = sanitizeHtml(req.query.endDate);
 
   start_date = start_date + "-00";
 
@@ -307,8 +325,8 @@ app.get("/DisplaySalesReport", async function(req, res)
   else
   {
     //waits for the response for database, then continues, utilizing the response string
-    var month = req.query.startDate.split("-")[1];
-    var year = req.query.startDate.split("-")[0];
+    var month = start_date.split("-")[1];
+    var year = start_date.split("-")[0];
     var month = parseInt(month) + 1;
 
     if (month < 10)
@@ -382,7 +400,7 @@ app.get("/Contact", function(req, res)
 
 app.get("/DeleteSalesRecord", async function(req, res)
 {
-  var saleID = req.query.saleID;
+  var saleID = sanitizeHtml(req.query.saleID);
 
   mysql.selectData("SELECT * FROM sales WHERE Sale_ID = '" + saleID +
   "'").then(itemResult =>
@@ -400,14 +418,15 @@ app.get("/DeleteSalesRecord", async function(req, res)
 
 app.post("/SalesRecordDeleted", async function(req, res)
 {
+  var saleID = sanitizeHtml(req.body.saleID);
   //waits for the response for database, then continues, utilizing the response string
   //deletes linked items
-  await mysql.insertData("DELETE FROM sales_items WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
+  await mysql.insertData("DELETE FROM sales_items WHERE Sale_ID =  ('" + saleID + "');").then(result => {
   if (result)
   {
     //deletes master sales record itself
-    mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + req.body.saleID + "');").then(result => {
-      res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: req.body.saleID});
+    mysql.insertData("DELETE FROM sales WHERE Sale_ID =  ('" + saleID + "');").then(result => {
+      res.render(path.join(__dirname + static_path + "salesRecordDeleted"), {saleID: saleID});
     });
   }
   });
@@ -415,7 +434,7 @@ app.post("/SalesRecordDeleted", async function(req, res)
 
 app.get("/DeleteItem", async function(req, res)
 {
-    var itemID = req.query.itemID;
+    var itemID = sanitizeHtml(req.query.itemID);
 
     mysql.selectData("SELECT * FROM item WHERE Item_ID = '" + itemID + "'").then(itemResult =>
     {
@@ -433,13 +452,14 @@ app.get("/DeleteItem", async function(req, res)
 
 app.post("/ItemDeleted", async function(req, res)
 {
+  var itemID = sanitizeHtml(req.post.itemID);
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID WHERE s_i.Item_ID = '" + req.post.itemID + "';").then(result => {
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID WHERE s_i.Item_ID = '" + itemID + "';").then(result => {
     if (result)
     {
-      mysql.selectData("DELETE FROM item WHERE Item_ID =  ('" + req.post.itemID + "');").then(itemResult =>
+      mysql.selectData("DELETE FROM item WHERE Item_ID =  ('" + itemID + "');").then(itemResult =>
       {
-        res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: req.post.itemID});
+        res.render(path.join(__dirname + static_path + "itemDeleted"), {itemID: itemID});
       });
     }
   });
@@ -447,7 +467,7 @@ app.post("/ItemDeleted", async function(req, res)
 
 app.get("/DeleteItemType", async function(req, res)
 {
-    var itemTypeID = req.query.itemTypeID;
+    var itemTypeID = sanitizeHtml(req.query.itemTypeID);
 
     mysql.selectData("SELECT * FROM item_types WHERE itmType_ID = '" + itemTypeID + "'").then(itemResult =>
     {
@@ -465,15 +485,16 @@ app.get("/DeleteItemType", async function(req, res)
 
 app.post("/ItemTypeDeleted", async function(req, res)
 {
+  var itemTypeID = sanitizeHtml(req.body.itemTypeID);
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID JOIN item i ON s_i.Item_ID = i.Item_ID WHERE i.itmType_ID = '" + req.body.itemTypeID + "';").then(result => {
+  await mysql.insertData("DELETE s_i, s FROM sales_items as s_i JOIN sales as s ON s_i.Sale_ID = s.Sale_ID JOIN item i ON s_i.Item_ID = i.Item_ID WHERE i.itmType_ID = '" + itemTypeID + "';").then(result => {
     if (result)
     {
-      mysql.selectData("DELETE FROM item WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+      mysql.selectData("DELETE FROM item WHERE itmType_ID =  ('" + itemTypeID + "');").then(itemResult =>
       {
-        mysql.selectData("DELETE FROM item_types WHERE itmType_ID =  ('" + req.body.itemTypeID + "');").then(itemResult =>
+        mysql.selectData("DELETE FROM item_types WHERE itmType_ID =  ('" + itemTypeID + "');").then(itemResult =>
         {
-          res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: req.body.itemTypeID});
+          res.render(path.join(__dirname + static_path + "itemTypeDeleted"), {itemTypeID: itemTypeID});
         });
       });
     }
@@ -483,7 +504,7 @@ app.post("/ItemTypeDeleted", async function(req, res)
 //Edit Item Page
 app.get("/EditItem", async function(req, res)
 {
-  var itemID = req.query.itemID;
+  var itemID = sanitizeHtml(req.query.itemID);
   //waits for the response for database, then continues, utilizing the response string
   await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result =>
     {
@@ -511,7 +532,7 @@ app.get("/EditItem", async function(req, res)
 
 app.get("/DeleteItem", async function(req, res)
 {
-  var itemID = req.query.itemID;
+  var itemID = sanitizeHtml(req.query.itemID);
   //waits for the response for database, then continues, utilizing the response string
   await mysql.selectData("SELECT * FROM item_types ORDER BY item_types.item_Type").then(result =>
     {
@@ -539,19 +560,23 @@ app.get("/DeleteItem", async function(req, res)
 
 app.post("/ItemEdited", async function(req, res)
 {
+  var itemName = sanitizeHtml(req.body.itemName);
+  var itemPrice = sanitizeHtml(req.body.itemPrice);
+  var itemID = sanitizeHtml(req.body.itemID);
+  var itemType = sanitizeHtml(req.body.itemType);
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("UPDATE item SET Item_Name = '" + req.body.itemName + "', Price = '" + req.body.itemPrice +
-    "', itmType_ID = '" + req.body.itemType + "' WHERE Item_ID = '" + req.body.itemID + "'").then(result => {
+  await mysql.insertData("UPDATE item SET Item_Name = '" + itemName + "', Price = '" + itemPrice +
+    "', itmType_ID = '" + itemType + "' WHERE Item_ID = '" + itemID + "'").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "ItemEdited"), {name: req.body.itemName});
+    res.render(path.join(__dirname + static_path + "ItemEdited"), {name: itemName});
   }
   });
 });
 
 app.get("/EditItemType", async function(req, res)
 {
-  var itemTypeID = req.query.itemTypeID;
+  var itemTypeID = sanitizeHtml(req.query.itemTypeID);
   //waits for the response for database, then continues, utilizing the response string
   await mysql.selectData("SELECT * FROM item_types WHERE itmType_ID = '" + itemTypeID + "'").then(result =>
     {
@@ -568,11 +593,14 @@ app.get("/EditItemType", async function(req, res)
 
 app.post("/ItemTypeEdited", async function(req, res)
 {
+  var typeName = sanitizeHtml(req.body.typeName);
+  var itemTypeID = sanitizeHtml(req.body.itemTypeID);
+
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.insertData("UPDATE item_types SET item_Type = '" + req.body.typeName + "' WHERE itmType_ID = '" + req.body.itemTypeID  + "'").then(result => {
+  await mysql.insertData("UPDATE item_types SET item_Type = '" + typeName + "' WHERE itmType_ID = '" + itemTypeID  + "'").then(result => {
     if (result)
     {
-      res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: req.body.typeName});
+      res.render(path.join(__dirname + static_path + "itemTypeAdded"), {name: typeName});
     }
   });
 });
@@ -601,14 +629,16 @@ app.get("/ViewSaleRecords", async function(req, res)
 // -----------------------------------------------------------------------------------------
 app.get("/getItems", async function(req, res)
 {
-  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + req.query.searchString + "%'").then(result => {
+  var searchString = sanitizeHtml(req.query.searchString);
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + searchString + "%'").then(result => {
     res.send(result);
   });
 });
 
 app.get("/getItemByID", async function(req, res)
 {
-  await mysql.selectData('SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = "' + req.query.itemID + '"').then(result => {
+  var itemID = sanitizeHtml(req.query.itemID);
+  await mysql.selectData('SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = "' + itemID + '"').then(result => {
     res.send(result);
   });
 });
@@ -616,7 +646,7 @@ app.get("/getItemByID", async function(req, res)
 app.get("/EditSalesRecord", async function(req, res)
 {
   //sale ID is stored in get variable is url, which is returned here
-  var saleID = req.query.saleID;
+  var saleID = sanitizeHtml(req.query.saleID);
 
   await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID WHERE sales.Sale_ID = '" + saleID + "'").then(saleResult =>
       {
@@ -654,9 +684,11 @@ app.post("/SalesEdited", async function(req, res)
   //new items, returns for the form submission
   var item_id_array = [];
 
+  var item_info = sanitizeHtml(req.body.item_info);
+
   //the item info is split into it's components
   //item info follow this structure: [item_id, quantity],[item_id, quantity],
-  req.body.item_info.split("]").forEach(function(element)
+  item_info.split("]").forEach(function(element)
   {
     if (element.trim().length > 0)
     {
@@ -668,9 +700,13 @@ app.post("/SalesEdited", async function(req, res)
     }
   });
 
+  var saleID = sanitizeHtml(req.body.saleID);
+  var saleDate = sanitizeHtml(req.body.salesDate);
+
   //selects all of the sales items associated with the sale record currently in the database
-  await mysql.selectData("SELECT * FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
+  await mysql.selectData("SELECT * FROM sales_items WHERE Sale_ID = '" + saleID + "'").then(result =>
   {
+
     //loops through all of the elements in sql result object
     result.forEach(function(element)
     {
@@ -683,12 +719,12 @@ app.post("/SalesEdited", async function(req, res)
       //if it doesn't contain the item, it is deleted
       if (filter_entries.length == 0)
       {
-        mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
+        mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + saleID + "' AND Item_ID = '" + element.Item_ID + "'");
       }
       else
       {
         //if it does contain the item, it is updated with returned form details
-        mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
+        mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + saleID + "' AND Item_ID = '" + element.Item_ID + "'")
       }
       //if not present in item_id_array insert here!
     })
@@ -701,22 +737,22 @@ app.post("/SalesEdited", async function(req, res)
       if (!old_item_id_array.includes(parseInt(element[0])))
       {
         //remove element!
-        mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + req.body.saleID + "', '" + element[0] + "', '" + element[1] + "')");
+        mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + saleID + "', '" + element[0] + "', '" + element[1] + "')");
       }
     });
 
     //master sales record is then updated
-    mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
+    mysql.selectData("UPDATE sales SET Sale_Date = '" + saleDate + "' WHERE Sale_ID = '" + saleID + "'").then(result =>
     {
       //page is then rendered
-      res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
+      res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: saleID});
     });
   });
 });
 
 app.get("/ForecastSales", async function(req, res)
 {
-  var item_id = req.query.itemID;
+  var item_id = sanitizeHtml(req.query.itemID);
   var data = [];
   var table_string = "";
 
@@ -738,7 +774,8 @@ app.get("/ForecastSales", async function(req, res)
 
 app.get("/ForecastItemType", async function(req, res)
 {
-  var item_type_id = req.query.itemType;
+  var item_type_id = sanitizeHtml(req.query.itemType);
+
   var data = [];
   var table_string = "";
 
