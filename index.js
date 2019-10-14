@@ -25,8 +25,8 @@ const middlewares = [bodyParser.urlencoded()]
 
 //Express Session Packages
 app.use(session({
-  secret: "secret", 
-  resave: true, 
+  secret: "secret",
+  resave: true,
   saveUninitialized: true
 }));
 
@@ -59,12 +59,17 @@ app.get("/Register", function(req, res){
 //Registration Script
 app.post("/RegisteredResult", async function(req, res){
 
-  await mysql.insertData("INSERT INTO users (FirstName, LastName, Email, Username, Password) VALUES ('" + req.body.FirstName + "', '" + req.body.LastName + "', '" + req.body.Email + "', '" + req.body.Username + "', '" + req.body.Password + "');").then(result => {
+  await mysql.selectData("INSERT INTO users (FirstName, LastName, Email, Username, Password) VALUES ('" + req.body.FirstName + "', '" +
+  req.body.LastName + "', '" + req.body.Email + "', '" + req.body.Username + "', '" + req.body.Password + "'); SELECT LAST_INSERT_ID() as insertid;").then(result => {
+    var userid = result[0].insertId;
     if (result)
     {
-      res.render(path.join(__dirname + static_path + "RegisteredResult"), {Username: req.body.Username});
-      mysql.insertData("INSERT INTO user_logins (User_ID, UserName, Password) VALUES('" + res.insertid + "', '" + req.body.Username + "', '" + req.body.Password + "');");
-    } else {
+      mysql.insertData("INSERT INTO user_logins (User_ID, UserName, Password) VALUES('" + userid + "', '" + req.body.Username + "', '" + req.body.Password + "');").then(result =>
+      {
+        res.render(path.join(__dirname + static_path + "RegisteredResult"), {Username: req.body.Username, FirstName: req.body.FirstName});
+      });
+    }
+    else {
       res.send('Please fill in all the fields!');
       res.redirect('/Register');
       res.end();
@@ -74,7 +79,7 @@ app.post("/RegisteredResult", async function(req, res){
 
 //User Login
 app.get("/Login", function(req, res){
-  
+
   res.render(path.join(__dirname + static_path + "Login"));
 
 });
@@ -85,14 +90,14 @@ app.post("/LoggingIn", async function(req, res){
   var password = req.body.Password;
 
   //Checks if username and password is entered before running script
-  if (username && password) 
+  if (username && password)
   {
     await mysql.selectData("SELECT * FROM user_logins WHERE Username = '" + username + "' AND Password = '" + password + "'", [username, password], function(error, results, fields){
       if (error){
         res.error("Incorrect Username and/or Password!");
         return done(error);
-      } 
-      else if (results.length > 0) 
+      }
+      else if (results.length > 0)
       {
         //Checks if the user is logged in, will redirect to home page if true
 				req.session.loggedin = true;
@@ -100,12 +105,12 @@ app.post("/LoggingIn", async function(req, res){
         req.session.password = password;
         res.redirect('/');
         // res.render(path.join(__dirname + static_path + "/"));
-      } 
+      }
       else
       {
         //res.error("Incorrect Username and/or Password!");
 				res.send('Incorrect Username and/or Password!');
-			}			
+			}
 			res.end();
     });
   } else {
@@ -122,7 +127,7 @@ app.post("/LoggingIn", async function(req, res){
   // }
 
   // passport.deserializeUser(function(id, done){
-  //   await mysql.selectData("SELECT * FROM user_logins WHERE User_ID = '" + User_ID "'", [id], 
+  //   await mysql.selectData("SELECT * FROM user_logins WHERE User_ID = '" + User_ID "'", [id],
   //   function (err, rows) {
   //     done(err, rows[0]);
   //   });
