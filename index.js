@@ -504,7 +504,7 @@ app.get("/EditItem", async function(req, res)
         });
 
         res.render(path.join(__dirname + static_path + "editItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
-        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
+        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'", itemStock: "value = '" + item_obj.stockQuantity + "'"});
       });
     });
 });
