@@ -47,11 +47,10 @@
           <td><%= ItemData[i].Item_Name %></td>
           <td><%= ItemData[i].Price %></td>
           <td><%= ItemData[i].item_Type %></td>
-          <td><%= ItemData[i].stockQuantity%></td>
 
-          <td class="td-button"><a class="general-button" href='/ForecastSales?itemID=<%= ItemData[i].itmType_ID %>'>View Sales/Prediction</a></td>
           <td class="td-button"><a class="general-button" href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
           <td class="td-button"><a class="general-button" href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete Item</a></td>
+          <td class="td-button"><a class="general-button" href='/ForecastSales?itemID=<%= ItemData[i].itmType_ID %>'>View Sales/Prediction</a></td>
 
         </tr>
     <% }
