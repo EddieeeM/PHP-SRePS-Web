@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>User Manager</title>
+  <script src="/js/jquery-3.4.1.min.js"></script>
+  <script src="/js/loadhtml.js"></script>
+  <link href="html/styles/stylesheet.css" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Include Header element -->
+  <div class="navbar" id="navbar"></div>
+  <h1>Users</h1>
+
+  <!-- Table to display Sales Record Data -->
+  <table class="table table-hover table-bordered">
+
+    <!-- Hard coded table headers -->
+    <thead>
+      <tr>
+        <th scope="col">User ID</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+
+    <!-- Table body -->
+    <tbody>
+
+    <!-- If there is table data - print it out -->
+    <% if(UserData.length) {
+      <!-- Create table entry for each observation -->
+      for(var i = 0; i < UserData.length; i++)
+      { %>
+        <tr>
+          <td><%= UserData[i].User_ID %></td>
+          <td><%= UserData[i].FirstName %></td>
+          <td><%= UserData[i].LastName %></td>
+          <td><%= UserData[i].Email %></td>
+          <td class="td-button"><a class="general-button" href='/EditItemType?userID=<%= UserData[i].User_ID %>'>Edit User</a></td>
+          <td class="td-button"><a class="general-button" href='/DeleteUserRecord?userID=<%= UserData[i].User_ID %>'>Delete User</a></td>
+        </tr>
+    <% }
+    }
+    <!-- Else there is no table data -->
+    else { %>
+      <tr>
+        <!-- Alert the user -->
+        <td colspan="4">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+      </tr>
+    <% }
+    %>
+    </tbody>
+  </table>
+
+  <!-- Include Footer element -->
+  <br />
+  <div id="footer"> </div>
+</body>
+</html>
