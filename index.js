@@ -83,8 +83,9 @@ app.post("/ItemAdded", async function(req, res)
   var itemName = sanitizeHtml(req.body.itemName);
   var itemPrice = sanitizeHtml(req.body.itemPrice);
   var itemType = sanitizeHtml(req.body.itemType);
+  var stockQuantity = sanitizeHtml(req.body.stockQuantity);
 
-  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID) VALUES ('" + itemName + "'," + itemPrice + "," + itemType + ");").then(result => {
+  await mysql.insertData("INSERT INTO item (Item_Name, Price, itmType_ID, stockQuantity) VALUES ('" + itemName + "'," + itemPrice + "," + itemType + "," + stockQuantity + ");").then(result => {
   if (result)
   {
     res.render(path.join(__dirname + static_path + "itemAdded"), {name: itemName});
@@ -374,7 +375,8 @@ app.get("/ViewItemRecords", async function(req, res)
 {
   // Querey database and wait for result response
   // Returns ALL sales records and passes in array
-  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID").then(result => {
+  //Orders by Item ID
+  await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID ORDER BY item_ID").then(result => {
 
     // Render view and pass result of query to be displayed
     res.render(path.join(__dirname + static_path + "ViewItemRecords"), {ItemData: result});
@@ -524,7 +526,7 @@ app.get("/EditItem", async function(req, res)
         });
 
         res.render(path.join(__dirname + static_path + "editItem"), {options: HTMLParser.parse(options_string), itemID: "value = '" + item_obj.Item_ID + "'",
-        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'"});
+        itemName: "value = '" + item_obj.Item_Name + "'", itemPrice: "value = '" + item_obj.Price + "'", itemStock: "value = '" + item_obj.stockQuantity + "'"});
       });
     });
 });
@@ -563,9 +565,16 @@ app.post("/ItemEdited", async function(req, res)
   var itemPrice = sanitizeHtml(req.body.itemPrice);
   var itemID = sanitizeHtml(req.body.itemID);
   var itemType = sanitizeHtml(req.body.itemType);
+  var itemStock = sanitizeHtml(req.body.itemStock);
   //waits for the response for database, then continues, utilizing the response string
+  // await mysql.insertData("UPDATE item SET Item_Name = '" + itemName + "', Price = '" + itemPrice +
+  //   "', itmType_ID = '" + itemType + "' WHERE Item_ID = '" + itemID + "'").then(result => {
+
   await mysql.insertData("UPDATE item SET Item_Name = '" + itemName + "', Price = '" + itemPrice +
-    "', itmType_ID = '" + itemType + "' WHERE Item_ID = '" + itemID + "'").then(result => {
+    "', itmType_ID = '" + itemType + "', stockQuantity = '" + itemStock + "' WHERE Item_ID = '" + itemID + "'").then(result => {
+
+
+
   if (result)
   {
     res.render(path.join(__dirname + static_path + "ItemEdited"), {name: itemName});

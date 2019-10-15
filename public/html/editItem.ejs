@@ -33,6 +33,10 @@
         <input required="required" type="number" step=".01" name="itemPrice" id="itemPrice" <%- itemPrice %>/>
       </p>
 
+      <p><label for="itemStock">Stock:</label>
+        <input required="required" type="number" name="itemStock" id="itemStock" <%- itemStock %>/>
+      </p>
+
       <p><label for="itemType">Item Type:</label>
         <select name="itemType" id="itemType">
           <%- options %>
@@ -40,8 +44,8 @@
       </p>
     </fieldset>
 
-    <input type="submit" value="Submit" />
-    <input type="reset" value="Reset Form" />
+    <input type="submit" class="formBtn" value="Submit" />
+    <input type="reset" class="formBtn" value="Reset Form" />
 
   </form>
 
