@@ -18,7 +18,7 @@
       var get_vars = url.split("?")[1];
       get_vars = url.split("&")
 
-      $("#downloadCSV").html("<a href='localhost:3001/DownloadCSV?startDate=" + get_vars[0].split("=")[1] + "&endDate=" + get_vars[1].split("=")[1] + "'>Download CSV Report</a>");
+      $("#downloadCSV").html("<a class='general-button' href='localhost:3001/DownloadCSV?startDate=" + get_vars[0].split("=")[1] + "&endDate=" + get_vars[1].split("=")[1] + "'>Download CSV Report</a>");
     });
     </script>
   </head>
@@ -28,6 +28,7 @@
     </div>
 
     <h1>Sales Report</h1>
+    <a href="/GenerateSalesReport"><p>< Generate Report</p></a>
 
     <p id="downloadCSV"></p>
 
