@@ -122,6 +122,36 @@ app.get("/ViewUsers", async function(req, res)
   });
 });
 
+app.get("/EditUserDetails", async function(req, res)
+{
+  var userID = req.query.userID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM users WHERE User_ID = '" + userID + "'").then(result =>
+    {
+        var user_obj;
+
+        result.forEach(function(element)
+        {
+          user_obj = element;
+        });
+
+        res.render(path.join(__dirname + static_path + "editUserDetails"), {userID: userID, FirstName: user_obj.FirstName, LastName: user_obj.LastName, Email: user_obj.Email});
+      });
+});
+
+app.post("/UserDetailsEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE users SET FirstName = '" + req.body.FirstName + "', LastName = '" + req.body.LastName +
+    "', Email = '" + req.body.Email + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+  if (result)
+  {
+    res.render(path.join(__dirname + static_path + "UserDetailsEdited"), {UserID: req.body.userID, FirstName: req.body.FirstName, LastName: req.body.LastName, Email: req.body.Email});
+  }
+  });
+});
+
+
 //User Login
 app.get("/Login", function(req, res){
 
