@@ -168,47 +168,6 @@ app.post("/LoggingIn", async function(req, res){
     res.send("Please Enter Username and Password!");
     res.end();
   }
-
-  // passport.use(new localStrategy(function (username, password, done) {
-  //   var username = req.body.Username;
-  //   var password = req.body.Password;
-  
-  //   console.log(username);
-  //   console.log(password);
-    
-  //   mysql.selectData("SELECT Password FROM user_logins WHERE Username = ?", [username], function(err, results, fields) 
-  //   {
-  //     if(err) { done(err) };
-  //     if(results.length == 0){
-  //       done(null, false);
-  //     }
-  
-  //     const hash = results[0].password.toString();
-  
-  //     bcrypt.compare(password, hash, function(err, response) {
-  //       if (response == true) {
-  //         return done(null, {user_id: results[0].id});
-  //       } else {
-  //         return done(null, false);
-  //       }
-  //     })
-  
-  //     return done(null,'Successful Login!');
-  //   })
-  // }));
-  
-  // passport.serializeUser(function(user, done){
-  //     done(null, mysql.selectData("SELECT * FROM user_Logins WHERE User_ID = '" + userid + "'"));
-  //   });
-  
-  // passport.deserializeUser(async function(id, done){
-  //   await mysql.selectData("SELECT * FROM user_logins WHERE User_ID = '" + User_ID +"'").then(result => {
-  //     // function(err, rows) {
-  //     //   done(err, rows[0]);
-  //     // };
-  //   });
-  // })
-  
 });
 
 app.get("/AddItemType", function(req, res)
@@ -217,7 +176,7 @@ app.get("/AddItemType", function(req, res)
     res.render(path.join(__dirname + static_path + "addItemType"));
     
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 
 });
@@ -234,7 +193,7 @@ app.post("/ItemTypeAdded", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -256,7 +215,7 @@ app.get("/AddItem", async function(req, res)
       res.render(path.join(__dirname + static_path + "addItem"), {options: HTMLParser.parse(options_string)});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -272,7 +231,7 @@ app.post("/ItemAdded", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -288,7 +247,7 @@ app.post("/ItemDeleted", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -298,7 +257,7 @@ app.get("/AddSalesRecord", async function(req, res)
   {
     res.render(path.join(__dirname + static_path + "addSales"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   };
 });
 
@@ -340,7 +299,7 @@ app.post("/SalesRecordAdded", async function(req, res)
         res.render(path.join(__dirname + static_path + "salesRecordAdded"), {date: req.body.salesDate});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -350,7 +309,7 @@ app.get("/SearchSalesRecord", async function(req, res)
   {
     res.render(path.join(__dirname + static_path + "searchSalesRecord"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -398,7 +357,7 @@ app.post("/ReturnSalesRecords", async function(req, res)
 
     res.render(path.join(__dirname + static_path + "returnSalesRecords"), {data: HTMLParser.parse(output_string)});
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -486,7 +445,7 @@ app.get("/DownloadCSV", async function(req, res)
     res.set('Content-Type', 'text/csv');
     res.status(200).send(output_string);
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 })
 
@@ -497,7 +456,7 @@ app.get("/GenerateSalesReport", function(req, res)
   {
     res.render(path.join(__dirname + static_path + "generateSalesReport"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -571,7 +530,7 @@ app.get("/DisplaySalesReport", async function(req, res)
 
     res.render(path.join(__dirname + static_path + "displaySalesReport"), {data: HTMLParser.parse(output_string)});
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -581,7 +540,7 @@ app.get("/ManageItems", function(req, res)
   {
     res.render(path.join(__dirname + static_path + "manageItems"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -591,7 +550,7 @@ app.get("/ManageItemTypes", function(req, res)
   {
     res.render(path.join(__dirname + static_path + "manageItemTypes"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -608,7 +567,7 @@ app.get("/ViewItemRecords", async function(req, res)
       res.render(path.join(__dirname + static_path + "ViewItemRecords"), {ItemData: result});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -624,7 +583,7 @@ app.get("/ViewItemTypeRecords", async function(req, res)
       res.render(path.join(__dirname + static_path + "ViewItemTypeRecords"), {ItemData: result});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -652,7 +611,7 @@ app.get("/DeleteSalesRecord", async function(req, res)
       res.render(path.join(__dirname + static_path + "deleteSales"), {saleIDValue: "value = '" + sale_obj.Sale_ID + "'", saleID: sale_obj.Sale_ID, saleDate: sale_obj.Sale_Date});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -673,7 +632,7 @@ app.post("/SalesRecordDeleted", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -696,7 +655,7 @@ app.get("/DeleteItem", async function(req, res)
       itemName: item_obj.Item_Name});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -715,7 +674,7 @@ app.post("/ItemDeleted", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -738,7 +697,7 @@ app.get("/DeleteItemType", async function(req, res)
         itemTypeName: item_obj.item_Type});
       });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -760,7 +719,7 @@ app.post("/ItemTypeDeleted", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -794,7 +753,7 @@ app.get("/EditItem", async function(req, res)
       });
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -827,7 +786,7 @@ app.get("/DeleteItem", async function(req, res)
       });
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -844,7 +803,7 @@ app.post("/ItemEdited", async function(req, res)
     }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -866,7 +825,7 @@ app.get("/EditItemType", async function(req, res)
       res.render(path.join(__dirname + static_path + "editItemType"), {itemTypeID: "value = '" + itemTypeID + "'", itemTypeName: "value = '" + itemType_obj.item_Type + "'"});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -882,7 +841,7 @@ app.post("/ItemTypeEdited", async function(req, res)
       }
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 // -----------------------------------------------------------------------------------------
@@ -896,7 +855,7 @@ app.get("/ManageSales", function(req, res)
   {
     res.render(path.join(__dirname + static_path + "manageSales"));
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -913,7 +872,7 @@ app.get("/ViewSaleRecords", async function(req, res)
       res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -926,7 +885,7 @@ app.get("/getItems", async function(req, res)
       res.send(result);
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -938,7 +897,7 @@ app.get("/getItemByID", async function(req, res)
       res.send(result);
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -976,7 +935,7 @@ app.get("/EditSalesRecord", async function(req, res)
           saleDate: "value = '" + final + "'", sale_items: sale_items});
         });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -1049,7 +1008,7 @@ app.post("/SalesEdited", async function(req, res)
         });
       });
     } else {
-      res.redirect(path.join(__dirname + static_path + "Login"));
+      res.redirect("/Login");
     }
   });
 
@@ -1075,7 +1034,7 @@ app.post("/SalesEdited", async function(req, res)
           res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
       });
     } else {
-      res.redirect(path.join(__dirname + static_path + "Login"));
+      res.redirect("/Login");
     }
 });
 
@@ -1102,7 +1061,7 @@ app.get("/ForecastItemType", async function(req, res)
 
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
   
 });
@@ -1120,7 +1079,7 @@ app.get("/SalesItemsPredictions", async function(req, res)
       res.render(path.join(__dirname + static_path + "salesItemsPredictions"), {ItemData: result});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
@@ -1136,7 +1095,7 @@ app.get("/SalesItemTypePredictions", async function(req, res)
       res.render(path.join(__dirname + static_path + "salesItemTypesPredictions"), {ItemData: result});
     });
   } else {
-    res.redirect(path.join(__dirname + static_path + "Login"));
+    res.redirect("/Login");
   }
 });
 
