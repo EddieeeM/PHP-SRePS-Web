@@ -7,13 +7,7 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
 
-  <script>
-    function show_prediction(item_id)
-    {
-      $("#prediction_frame").show();
-      $("#display_frame").attr("src", "./ForecastSales?itemID=" + item_id);
-    }
-  </script>
+  <script src="/js/form_transformation.js"></script>
 
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
@@ -51,7 +45,7 @@
           <td><%= ItemData[i].Item_Name %></td>
           <td>$ <%= ItemData[i].Price %></td>
           <td><%= ItemData[i].item_Type %></td>
-          <td><button onclick='show_prediction(<%= ItemData[i].Item_ID %>)'>View Predictions</button></td>
+          <td><button class="formBtn" onclick='show_prediction(<%= ItemData[i].Item_ID %>, "itemID", "ForecastSales")'>View Predictions</button></td>
         </tr>
     <% }
     }
