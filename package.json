@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/keestim/PHP-SRePS-Project#readme",
   "dependencies": {
+    "bcryptjs": "*",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
     "ejs": "^2.7.1",
@@ -28,6 +29,9 @@
     "mysql": "^2.17.1",
     "node-html-parser": "^1.1.16",
     "path": "^0.12.7",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
     "sanitize-html": "^1.20.1",
     "tedious": "^6.3.0",
     "timeseries-analysis": "^1.0.12",
