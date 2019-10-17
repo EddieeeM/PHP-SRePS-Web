@@ -32,7 +32,7 @@ function draw_item_input(item_id, item_capacity)
     {
       //prints to page the item selection element with item specific details
       $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
-       + "</strong> | Stock Quantity: " + item_result.stockQuantity + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' min='1' id='quantity_" +
+       + "</strong> | Stock Remaining: " + item_result.itemsRemaining + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' min='1' id='quantity_" +
        parseInt(item_result.Item_ID) + "'/></p><button class='formBtn' id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
 
     }
@@ -40,7 +40,7 @@ function draw_item_input(item_id, item_capacity)
     {
       //prints to page the item selection element with item specific details
       $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
-       + "</strong> | Stock Quantity: " + item_result.stockQuantity + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
+       + "</strong> | Stock Remaining: " + item_result.itemsRemaining + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
        parseInt(item_result.Item_ID) + "' value='" + item_capacity + "'/></p><button id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
     }
   }

@@ -46,7 +46,27 @@
           <td><%= ItemData[i].item_Type %></td>
           <td><%= ItemData[i].stockQuantity %></td>
           <td><%= ItemData[i].itemsSold %></td>
-          <td><%= ItemData[i].itemsRemaining %></td>
+          <%
+            if (ItemData[i].itemsRemaining > 0)
+            {
+              %>
+              <td class='stock_available'><%= ItemData[i].itemsRemaining %></td>
+              <%
+            }
+            else if (ItemData[i].itemsRemaining == 0)
+            {
+              %>
+              <td><%= ItemData[i].itemsRemaining %></td>
+              <%
+            }
+            else
+            {
+              %>
+              <td class="no_stock_available"><%= ItemData[i].itemsRemaining %></td>
+              <%
+            }
+          %>
+
 
         </tr>
     <% }
