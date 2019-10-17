@@ -178,6 +178,23 @@ app.post("/LoggingIn", async function(req, res){
   }
 });
 
+//LogOut Script
+app.get("/Logout", function(req,res){
+
+  if(req.session.loggedin) 
+  {
+    req.session.destroy(function (err)
+    {
+      if(err) 
+      {
+        next(err);
+      } else {
+        res.redirect("/Login");
+      }
+    })
+  }
+})
+
 app.get("/AddItemType", function(req, res)
 {
   if (req.session.loggedin)
@@ -206,6 +223,7 @@ app.post("/ItemTypeAdded", async function(req, res)
   {
     res.redirect("/Login");
   }
+
 });
 
 app.get("/AddItem", async function(req, res)
