@@ -82,3 +82,10 @@ exports.getGraphURL = function(input_data, smoothing_amount)
 
   return t.chart({main:true,points:[{color:'ff0000',point:input_data.length,serie:0}]});
 }
+
+exports.getGraph = function(input_data)
+{
+  // Load the data
+  var t = new timeseries.main(input_data);
+  return t.chart({main:true,points:[{color:'ff0000',point:input_data.length,serie:0}]});
+}

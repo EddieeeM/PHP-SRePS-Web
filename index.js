@@ -1171,7 +1171,7 @@ app.get("/ForecastSales", async function(req, res)
       var item_id = req.query.itemID;
       var data = [];
       var table_string = "";
-
+      var graphURL="";
         await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
           item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
           var entry;
@@ -1182,8 +1182,10 @@ app.get("/ForecastSales", async function(req, res)
             data.push([element.Sale_Date, element.Quantity]);
             table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
           });
-
-          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+          
+          //get the google image chart URL and customize 
+          graphURL=forecast.getGraphURL(data,2)+"&chtt=Sales+Prediction+Graph&chdl=Past+Sale|Predicted+Sales&chco=ff0000,F19AFF&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
+          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
       });
     }
     else
@@ -1192,6 +1194,35 @@ app.get("/ForecastSales", async function(req, res)
     }
 });
 
+app.get("/SalesGraph", async function(req, res)
+  {
+    if(req.session.loggedin)
+    {
+      var item_id = req.query.itemID;
+      var data = [];
+      var table_string = "";
+      var graphURL="";
+        await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+          item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+          var entry;
+
+          result.forEach(function(element)
+          {
+            entry = element;
+            data.push([element.Sale_Date, element.Quantity]);
+            table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+          });
+          
+          //get the google image chart URL and customize 
+          graphURL=forecast.getGraph(data)+"&chtt=Sales+Record&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
+          res.render(path.join(__dirname + static_path + "salesGraph"), {item_id: item_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+      });
+    }
+    else
+    {
+      res.redirect("/Login");
+    }
+});
 app.get("/ForecastItemType", async function(req, res)
 {
   if(req.session.loggedin)
@@ -1199,7 +1230,7 @@ app.get("/ForecastItemType", async function(req, res)
     var item_type_id = sanitizeHtml(req.query.itemType);
     var data = [];
     var table_string = "";
-
+    var graphURL="";
       await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
         item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
         var entry;
@@ -1210,8 +1241,8 @@ app.get("/ForecastItemType", async function(req, res)
           data.push([element.Sale_Date, element.Quantity]);
           table_string += "<tr><td>" + element.Item_Name + "</td><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
         });
-
-        res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+        graphURL=forecast.getGraphURL(data,2)+"&chtt=Sales+Items+Type+Prediction&chdl=Past+Sale|Predicted+Sales&chco=ff0000,F19AFF&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
+        res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
 
     });
   } else {
