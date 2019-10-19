@@ -4,7 +4,7 @@ function show_prediction(item_id, get_var, route)
   $("#display_frame").attr("src", "./" + route + "?" + get_var + "=" + item_id);
 }
 
-function displayRangeRange()
+function displayDateRange()
 {
   if ($("#extended_range").is(":hidden"))
   {

@@ -1112,57 +1112,26 @@ app.post("/SalesEdited", async function(req, res)
   }
 });
 
-app.get("/ForecastSales", async function(req, res)
-{
-  var item_id = sanitizeHtml(req.query.itemID);
-  var data = [];
-  var table_string = "";
-  if(req.session.loggedin)
+  app.get("/ForecastSales", async function(req, res)
   {
+    if(req.session.loggedin)
+    {
+      var item_id = sanitizeHtml(req.query.itemID);
+      var data = [];
+      var table_string = "";
 
-    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-      item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
-      var entry;
+      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+        item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+        var entry;
 
-      result.forEach(function(element)
-      {
-        //adds ID of old element to array
-        old_item_id_array.push(parseInt(element.Item_ID));
-        //filters entry, producing an array
-        //return array, indicates array returned from form, includes a currrent sales item
-        var filter_entries = item_id_array.filter(i => parseInt(i[0]) == parseInt(element.Item_ID));
-
-        //if it doesn't contain the item, it is deleted
-        if (filter_entries.length == 0)
+        result.forEach(function(element)
         {
-          mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
-        }
-        else
-        {
-          //if it does contain the item, it is updated with returned form details
-          mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
-        }
-        //if not present in item_id_array insert here!
-      })
-
-      //loops through list of item return from form
-      item_id_array.forEach(function(element)
-      {
-        //if there is an item that exists in the new array that doesn't exist in the old item_id_array
-        //then this is added to the database
-        if (!old_item_id_array.includes(parseInt(element[0])))
-        {
-          //remove element!
-          mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + req.body.saleID + "', '" + element[0] + "', '" + element[1] + "')");
-        }
-      });
-
-      //master sales record is then updated
-      mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
-        {
-        //page is then rendered
-        res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
+          table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
         });
+
+        res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
       });
     }
     else
@@ -1170,34 +1139,6 @@ app.get("/ForecastSales", async function(req, res)
       res.redirect("/Login");
     }
   });
-
-  app.get("/ForecastSales", async function(req, res)
-  {
-    if(req.session.loggedin)
-    {
-      var item_id = req.query.itemID;
-      var data = [];
-      var table_string = "";
-
-        await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-          item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
-          var entry;
-
-          result.forEach(function(element)
-          {
-            entry = element;
-            data.push([element.Sale_Date, element.Quantity]);
-            table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
-          });
-
-          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
-      });
-    }
-    else
-    {
-      res.redirect("/Login");
-    }
-});
 
 app.get("/ForecastItemType", async function(req, res)
 {
