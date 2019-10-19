@@ -126,7 +126,7 @@ app.get("/EditUserDetails", async function(req, res)
 {
   var userID = req.query.userID;
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.selectData("SELECT * FROM users WHERE User_ID = '" + userID + "'").then(result =>
+  await mysql.selectData("SELECT * FROM users JOIN user_logins ON users.User_ID = user_logins.User_ID WHERE users.User_ID = '" + userID + "'").then(result =>
     {
         var user_obj;
 
@@ -135,7 +135,7 @@ app.get("/EditUserDetails", async function(req, res)
           user_obj = element;
         });
 
-        res.render(path.join(__dirname + static_path + "editUserDetails"), {userID: userID, FirstName: user_obj.FirstName, LastName: user_obj.LastName, Email: user_obj.Email});
+        res.render(path.join(__dirname + static_path + "editUserDetails"), {userID: userID, FirstName: user_obj.FirstName, LastName: user_obj.LastName, Email: user_obj.Email, UserName: user_obj.Username});
       });
 });
 
@@ -146,7 +146,12 @@ app.post("/UserDetailsEdited", async function(req, res)
     "', Email = '" + req.body.Email + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
   if (result)
   {
-    res.render(path.join(__dirname + static_path + "UserDetailsEdited"), {UserID: req.body.userID, FirstName: req.body.FirstName, LastName: req.body.LastName, Email: req.body.Email});
+    mysql.insertData("UPDATE user_logins SET UserName = '" + req.body.UserName + "', Password = '" + req.body.Password + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+      if (result)
+      {
+        res.render(path.join(__dirname + static_path + "UserDetailsEdited"), {UserID: req.body.userID, FirstName: req.body.FirstName, LastName: req.body.LastName, Email: req.body.Email});
+      }
+    });
   }
   });
 });

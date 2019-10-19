@@ -24,7 +24,7 @@
         <th scope="col">First Name</th>
         <th scope="col">Last Name</th>
         <th scope="col">Email</th>
-        <th scope="col">Edit</th>
+        <th scope="col">Edit Details</th>        
         <th scope="col">Delete</th>
       </tr>
     </thead>
@@ -42,7 +42,7 @@
           <td><%= UserData[i].FirstName %></td>
           <td><%= UserData[i].LastName %></td>
           <td><%= UserData[i].Email %></td>
-          <td class="td-button"><a class="general-button" href='/EditItemType?userID=<%= UserData[i].User_ID %>'>Edit User</a></td>
+          <td class="td-button"><a class="general-button" href='/EditUserDetails?userID=<%= UserData[i].User_ID %>'>Edit User</a></td>
           <td class="td-button"><a class="general-button" href='/DeleteUserRecord?userID=<%= UserData[i].User_ID %>'>Delete User</a></td>
         </tr>
     <% }
