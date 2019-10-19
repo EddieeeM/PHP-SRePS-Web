@@ -16,6 +16,27 @@
   <div class="navbar" id="navbar"></div>
   <h1>Stock Levels</h1>
 
+  <fieldset>
+    <legend>Search Options</legend>
+    <form>
+      <table>
+        <tr>
+        <td><input type="radio" name='item_subset' id='all' checked value='all'/><label for='all'>Show All Items</label></td>
+        <td><input type="radio" name='item_subset' id='pos' value='pos'/><label for='pos'>Show Only With 1 or More Stock</label></td>
+        <td><input type="radio" name='item_subset' id='neg' value='neg'/><label for='neg'>Show Items With 0 or Less Stock</label></td>
+      </tr>
+    </table>
+
+      <label for='all'>Search for Item by Name: </label><input type="text" name='item_string' id='item_string'/>
+
+
+      <input type="submit" value="Search" class="formBtn" />
+    </form>
+  </fieldset>
+
+  <br/>
+
+
   <!-- Table to display Sales Record Data -->
   <table class="table table-hover table-bordered">
 
