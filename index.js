@@ -526,6 +526,11 @@ app.get("/ManageItems", function(req, res)
   res.render(path.join(__dirname + static_path + "manageItems"));
 });
 
+app.get("/ManageUsers", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageUsers"));
+});
+
 app.get("/ManageItemTypes", function(req, res)
 {
   res.render(path.join(__dirname + static_path + "manageItemTypes"));
