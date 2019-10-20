@@ -157,6 +157,12 @@ iframe
   text-align: center;
 }
 
+.span-full {
+  width: 99.6%;
+  display: inline-block;
+  text-align: center;
+}
+
 /* Button styling - Links / Visited Links */
 .general-button:link, .general-button:visited {
   border: 0;
