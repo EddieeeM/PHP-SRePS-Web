@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="PHP-SRePS" />
+    <meta name="keywords" content="SWE300010 - Development Project 2 - Design, Planning and Management" />
+    <meta name="author" content="Wilson To" />
+    <title>Sales Performance</title>
+
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+
+  </head>
+
+  <body class='iframe_layout'>
+
+   
+      <h1>Item <%=item_id %> Details</h1>
+      <p>Name: <%=name %></p>
+      <p>Price: $<%=price %></p>
+
+      <h2>Past Sales</h2>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>Quantity</th>
+        </tr>
+
+        <%- data %>
+      </table>
+
+      <h2>Sales Record</h2>
+      <p>Items</p>
+
+      <img class='graph_img' src=<%=graph %> />
+
+  </body>
+</html>

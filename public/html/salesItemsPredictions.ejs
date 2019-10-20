@@ -50,6 +50,7 @@
           <td class="centerColText">$ <%= ItemData[i].Price %></td>
           <td class="centerColText"><%= ItemData[i].item_Type %></td>
           <td class="centerColText"><button onclick='show_prediction(<%= ItemData[i].Item_ID %>, "itemID", "ForecastSales")'>View Predictions</button></td>
+          <td class="centerColText"><button class="formBtn" onclick='show_graph(<%= ItemData[i].Item_ID %>, "itemID","SalesGraph")'>View Graph</button></td>
         </tr>
     <% }
     }
