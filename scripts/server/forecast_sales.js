@@ -30,7 +30,7 @@ exports.predictSales = function(input_data, smoothing_amount)
         // For each coefficient, we substract from "forecast" the value of the "N - x" datapoint's value, multiplicated by the coefficient, where N is the last known datapoint value, and x is the coefficient's index.
     }
 
-    return forecast;
+    return Math.round(forecast);
   }
   else
   {
@@ -51,7 +51,31 @@ exports.predictSalesFurther = function(input_data, smoothing_amount, number_of_s
 
   var prediction = exports.predictSales(input_data, smoothing_amount);
 
-  console.log(input_data[input_data.length - 1][0].toISOString());
+  var date_string = input_data[input_data.length - 1][0].toISOString().split('T')[0];
+  var last_date = new Date(date_string.split("-")[0], date_string.split("-")[1] - 1, date_string.split("-")[2]);
+  last_date = new Date(last_date.valueOf() + 1000*3600*24);
+
+  new_date = new Date(last_date.valueOf() + 1000*3600*24);
+
+  input_data.push([new_date, prediction]);
+  counter++;
+
+  exports.predictSalesFurther(input_data, smoothing_amount, number_of_sales, counter);
+}
+
+exports.predictSalesFurtherGetArray = function(input_data, smoothing_amount, number_of_sales, counter)
+{
+  if (counter == null)
+  {
+    counter = 0;
+  }
+  else if (counter == number_of_sales)
+  {
+    console.log(input_data);
+    return input_data;
+  }
+
+  var prediction = exports.predictSales(input_data, smoothing_amount);
 
   var date_string = input_data[input_data.length - 1][0].toISOString().split('T')[0];
   var last_date = new Date(date_string.split("-")[0], date_string.split("-")[1] - 1, date_string.split("-")[2]);
@@ -60,7 +84,7 @@ exports.predictSalesFurther = function(input_data, smoothing_amount, number_of_s
   new_date = new Date(last_date.valueOf() + 1000*3600*24);
 
   input_data.push([new_date, prediction]);
-  counter = counter + 1;
+  counter++;
 
   exports.predictSalesFurther(input_data, smoothing_amount, number_of_sales, counter);
 }
@@ -83,9 +107,24 @@ exports.getGraphURL = function(input_data, smoothing_amount)
   return t.chart({main:true,points:[{color:'ff0000',point:input_data.length,serie:0}]});
 }
 
-exports.getGraph = function(input_data)
+exports.getGraphURLExtended = function(input_data, smoothing_amount, number_of_sales)
 {
+  if (smoothing_amount == null)
+  {
+    smoothing_amount = 2;
+  }
+
   // Load the data
-  var t = new timeseries.main(input_data);
-  return t.chart({main:true,points:[{color:'ff0000',point:input_data.length,serie:0}]});
+  (exports.predictSalesFurtherGetArray(input_data, smoothing_amount, number_of_sales)).then(result =>
+    {
+      input_data = result;
+      var t = new timeseries.main(result);
+
+      //sample = number of past data points Used
+      t.smoother({period:smoothing_amount}).save('smoothed');
+
+      t.sliding_regression_forecast({sample:input_data.length, degree: 5});
+
+      return t.chart({main:true,points:[{color:'ff0000',point:input_data.length,serie:0}]});
+    });
 }

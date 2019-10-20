@@ -28,7 +28,17 @@
         //loops through returned SQL results, constructing an output string
         result.forEach(function(element)
         {
-          output_string += "<p>Item: " + element.Item_ID + " | " + element.Item_Name + " | Stock Quantity: " + element.stockQuantity + " <button name='add_item' id='add_item' class='formBtn' value='" + element.Item_ID + "'>Add Item</button> </p>";
+          var Stock_Remaining_String = "";
+          if (element.itemsRemaining != null)
+          {
+            Stock_Remaining_String = "| Stock Remaining: " + element.itemsRemaining;
+          }
+          else
+          {
+            Stock_Remaining_String = "";
+          }
+
+          output_string += "<p>Item: " + element.Item_ID + " | " + element.Item_Name + Stock_Remaining_String + "<button name='add_item' id='add_item' class='formBtn' value='" + element.Item_ID + "'>Add Item</button> </p>";
         });
 
         //output string write to div with id = items

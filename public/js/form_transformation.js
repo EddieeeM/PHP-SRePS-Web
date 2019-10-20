@@ -10,7 +10,7 @@ function show_graph(item_id, get_var, route)
   $("#display_frame").attr("src", "./" + route + "?" + get_var + "=" + item_id);
 }
 
-function displayRangeRange()
+function displayDateRange()
 {
   if ($("#extended_range").is(":hidden"))
   {
@@ -28,17 +28,28 @@ function draw_item_input(item_id, item_capacity)
   //ajax request to get a list of return objects
   $.ajax({url: "/getItemByID?itemID=" + item_id, success: function(result){
     var item_result;
+    var Stock_Remaining_String;
     //loops through return objects, selecting the last on
     result.forEach(function(element)
     {
       item_result = element;
     });
 
-    if (item_capacity == null)
+
+    if (item_result == null)
     {
+      if (!isNaN(parseFloat(item_result.itemsRemaining)))
+      {
+        Stock_Remaining_String = "| Stock Remaining: " + parseFloat(item_result.itemsRemaining);
+      }
+      else
+      {
+        Stock_Remaining_String = "";
+      }
+
       //prints to page the item selection element with item specific details
       $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
-       + "</strong> | Stock Quantity: " + item_result.stockQuantity + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' min='1' id='quantity_" +
+       + "</strong>" + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' min='1' id='quantity_" +
        parseInt(item_result.Item_ID) + "'/></p><button class='formBtn' id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
 
     }
@@ -46,7 +57,7 @@ function draw_item_input(item_id, item_capacity)
     {
       //prints to page the item selection element with item specific details
       $("#item_selection").append("<div id='" + item_result.Item_ID + "'><fieldset><p>Item: <strong>" + item_result.Item_Name
-       + "</strong> | Stock Quantity: " + item_result.stockQuantity + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
+       + "</strong>" + "</p><p><label for='quantity_" + parseInt(item_result.Item_ID) + "'>Quantity: </label> <input type='number' id='quantity_" +
        parseInt(item_result.Item_ID) + "' value='" + item_capacity + "'/></p><button id='remove_element' name='remove_element' value='" + item_result.Item_ID + "'>Remove</button></fieldset></div>");
     }
   }

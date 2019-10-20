@@ -4,6 +4,11 @@
   font-family: Calabri;
 }
 
+html
+{
+  font-family: sans-serif;
+}
+
 body {
   margin-left: 15em;
   margin-right: 15em;
@@ -38,6 +43,16 @@ iframe
 {
   height: 1000px;
   width: 100%;
+}
+
+.stock_available
+{
+  color: green;
+}
+
+.no_stock_available
+{
+  color: red;
 }
 
 
@@ -123,7 +138,7 @@ iframe
 }
 
 /* Logout Button Style */
-.logoutButton {
+.rightAlign {
   float: right;
 }
 /* END OF NAV BAR STYLE                                            */

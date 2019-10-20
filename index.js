@@ -129,6 +129,85 @@ app.post("/RegisteredResult", async function(req, res){
   });
 });
 
+app.get("/DeleteUserRecord", async function(req, res)
+{
+  var userID = req.query.userID;
+
+  mysql.selectData("SELECT * FROM users WHERE User_ID = '" + userID +
+  "'").then(userResult =>
+  {
+    var user_obj;
+    userResult.forEach(function(element)
+    {
+      user_obj = element;
+      //renders ejs doc as html, replace document variables with options for the select field
+    });
+
+    res.render(path.join(__dirname + static_path + "deleteUser"), {userID: user_obj.User_ID, userName: user_obj.FirstName, userIDValue: user_obj.User_ID});
+  });
+});
+
+app.post("/UserRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  //deletes linked items
+  await mysql.insertData("DELETE FROM user_logins WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
+
+    //deletes master sales record itself
+    mysql.insertData("DELETE FROM users WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
+      res.render(path.join(__dirname + static_path + "userRecordDeleted"), {userID: req.body.userID});
+    });
+
+  });
+});
+
+
+app.get("/ViewUsers", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM users").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "viewUsers"), {UserData: result});
+  });
+});
+
+app.get("/EditUserDetails", async function(req, res)
+{
+  var userID = req.query.userID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM users JOIN user_logins ON users.User_ID = user_logins.User_ID WHERE users.User_ID = '" + userID + "'").then(result =>
+    {
+        var user_obj;
+
+        result.forEach(function(element)
+        {
+          user_obj = element;
+        });
+
+        res.render(path.join(__dirname + static_path + "editUserDetails"), {userID: userID, FirstName: user_obj.FirstName, LastName: user_obj.LastName, Email: user_obj.Email, UserName: user_obj.Username});
+      });
+});
+
+app.post("/UserDetailsEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE users SET FirstName = '" + req.body.FirstName + "', LastName = '" + req.body.LastName +
+    "', Email = '" + req.body.Email + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+  if (result)
+  {
+    mysql.insertData("UPDATE user_logins SET UserName = '" + req.body.UserName + "', Password = '" + req.body.Password + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+      if (result)
+      {
+        res.render(path.join(__dirname + static_path + "UserDetailsEdited"), {UserID: req.body.userID, FirstName: req.body.FirstName, LastName: req.body.LastName, Email: req.body.Email});
+      }
+    });
+  }
+  });
+});
+
+
 //User Login
 app.get("/Login", function(req, res){
 
@@ -181,11 +260,11 @@ app.post("/LoggingIn", async function(req, res){
 //LogOut Script
 app.get("/Logout", function(req,res){
 
-  if(req.session.loggedin) 
+  if(req.session.loggedin)
   {
     req.session.destroy(function (err)
     {
-      if(err) 
+      if(err)
       {
         next(err);
       } else {
@@ -193,7 +272,7 @@ app.get("/Logout", function(req,res){
       }
     })
   }
-})
+});
 
 app.get("/AddItemType", function(req, res)
 {
@@ -426,7 +505,29 @@ app.get("/DownloadCSV", async function(req, res)
         end_date = end_date + "-00";
       }
 
-      var output_string = "";
+      var data = [];
+      var entry;
+
+      result.forEach(function(element)
+      {
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
+      });
+
+      result.forEach(function(element)
+      {
+        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
+          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date;
+
+          if (prediction == "true")
+          {
+            output_string += "," + forecast.predictSales(data, 2) + '\n';
+          }
+          else
+          {
+            output_string += '\n';
+          }
+      });
 
       if (end_date.length > 0)
       {
@@ -468,10 +569,30 @@ app.get("/DownloadCSV", async function(req, res)
         await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
           start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
+          var data = [];
+          var entry;
+
+          result.forEach(function(element)
+          {
+            entry = element;
+            data.push([element.Sale_Date, element.Quantity]);
+          });
+
+
           result.forEach(function(element)
           {
             output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
-              element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';});
+              element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date;
+
+              if (prediction == "true")
+              {
+                output_string += "," + forecast.predictSales(data, 2) + '\n';
+              }
+              else
+              {
+                output_string += '\n';
+              }
+          });
 
           if (output_string.length == 0)
           {
@@ -493,8 +614,9 @@ app.get("/DownloadCSV", async function(req, res)
       res.set('Content-Type', 'text/csv');
       res.status(200).send(output_string);
   }
-  else {
-    //res.redirect("/Login");
+  else
+  {
+    res.redirect("/Login");
   }
 })
 
@@ -515,6 +637,7 @@ app.get("/DisplaySalesReport", async function(req, res)
   {
     var start_date = sanitizeHtml(req.query.startDate);
     var end_date = sanitizeHtml(req.query.endDate);
+    var prediction = req.query.displayPredictions;
 
     start_date = start_date + "-00";
 
@@ -531,9 +654,31 @@ app.get("/DisplaySalesReport", async function(req, res)
       await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
         start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
+          var data = [];
+          var entry;
+
+          result.forEach(function(element)
+          {
+            entry = element;
+            data.push([element.Sale_Date, element.Quantity]);
+          });
+
         result.forEach(function(element)
         {
-          output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+          output_string += "<tr><td>" + element.Sale_ID +
+          "</td><td>" + element.Quantity +
+          "</td><td>" + element.Item_ID +
+          "</td><td>" + element.Item_Name +
+          "</td><td>" + element.Sale_Date;
+
+          if (prediction == "true")
+          {
+            output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+          }
+          else
+          {
+            output_string += "</td></tr>";
+          }
         });
 
         if (output_string.length == 0)
@@ -545,8 +690,8 @@ app.get("/DisplaySalesReport", async function(req, res)
     else
     {
       //waits for the response for database, then continues, utilizing the response string
-      var month = start_date.split("-")[1];
-      var year = start_date.split("-")[0];
+      var month = req.query.startDate.split("-")[1];
+      var year = req.query.startDate.split("-")[0];
       var month = parseInt(month) + 1;
 
       if (month < 10)
@@ -564,10 +709,32 @@ app.get("/DisplaySalesReport", async function(req, res)
       await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
         start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
+        var data = [];
+        var entry;
+
         result.forEach(function(element)
         {
-          output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
         });
+
+        result.forEach(function(element)
+        {
+          output_string += "<tr><td>" + element.Sale_ID +
+          "</td><td>" + element.Quantity +
+          "</td><td>" + element.Item_ID +
+          "</td><td>" + element.Item_Name +
+          "</td><td>" + element.Sale_Date;
+        });
+
+        if (prediction == "true")
+        {
+          output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+        }
+        else
+        {
+          output_string += "</td></tr>";
+        }
 
         if (output_string.length == 0)
         {
@@ -595,12 +762,86 @@ app.get("/ManageItems", function(req, res)
   }
 });
 
+app.get("/ManageUsers", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageUsers"));
+});
+
 app.get("/ManageItemTypes", function(req, res)
 {
   if (req.session.loggedin)
   {
     res.render(path.join(__dirname + static_path + "manageItemTypes"));
   } else {
+    res.redirect("/Login");
+  }
+});
+
+// View Items page
+app.get("/ViewStockLevels", async function(req, res)
+{
+    if(req.session.loggedin)
+    {
+      if (req.query.item_subset != null)
+      {
+        var search_string = req.query.item_string;
+
+        switch (req.query.item_subset)
+        {
+          case "all":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+
+          case "pos":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining > 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+
+          case "neg":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining <= 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+        }
+      }
+      else
+      {
+        await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+          "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+          "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+          "GROUP BY (sales_items.Item_ID) ORDER BY itemsRemaining DESC").then(result =>
+        {
+          // Render view and pass result of query to be displayed
+          res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+        });
+      }
+
+      // Query database and wait for result response
+      // Returns ALL sales records and passes in array
+      // Querey database and wait for result response
+      // Returns ALL sales records and passes in array
+      //Orders by Item ID
+  }
+  else
+  {
     res.redirect("/Login");
   }
 });
@@ -947,7 +1188,7 @@ app.get("/ViewSaleRecords", async function(req, res)
   {
     // Query database and wait for result response
     // Returns ALL sales records and passes in array
-    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID").then(result => {
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID ORDER BY sales.Sale_Date").then(result => {
 
       // Render view and pass result of query to be displayed
       res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
@@ -963,7 +1204,7 @@ app.get("/getItems", async function(req, res)
   if(req.session.loggedin)
   {
     var searchString = sanitizeHtml(req.query.searchString);
-    await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + searchString + "%'").then(result => {
+    await mysql.selectData("SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + searchString + "%' GROUP BY sales_items.Item_ID, item.Item_ID").then(result => {
       res.send(result);
     });
   } else {
@@ -976,7 +1217,7 @@ app.get("/getItemByID", async function(req, res)
   if(req.session.loggedin)
   {
     var itemID = sanitizeHtml(req.query.itemID);
-    await mysql.selectData('SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = "' + itemID + '"').then(result => {
+    await mysql.selectData('SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_ID = "' + itemID + '"  GROUP BY sales_items.Item_ID, item.Item_ID').then(result => {
       res.send(result);
     });
   } else {
@@ -1107,64 +1348,34 @@ app.post("/SalesEdited", async function(req, res)
 
 app.get("/ForecastSales", async function(req, res)
 {
-  var item_id = sanitizeHtml(req.query.itemID);
-  var data = [];
-  var table_string = "";
   if(req.session.loggedin)
   {
+    var item_id = req.query.itemID;
+    var data = [];
+    var table_string = "";
 
-    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-      item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
-      var entry;
+      await mysql.selectData("SELECT * FROM sales RIGHT JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+        item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+        var entry;
 
-      result.forEach(function(element)
-      {
-        //adds ID of old element to array
-        old_item_id_array.push(parseInt(element.Item_ID));
-        //filters entry, producing an array
-        //return array, indicates array returned from form, includes a currrent sales item
-        var filter_entries = item_id_array.filter(i => parseInt(i[0]) == parseInt(element.Item_ID));
-
-        //if it doesn't contain the item, it is deleted
-        if (filter_entries.length == 0)
+        result.forEach(function(element)
         {
-          mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
+          table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+        });
+
+        if (result.length > 0)
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
         }
         else
         {
-          //if it does contain the item, it is updated with returned form details
-          mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
+          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: '', name: '', price: '', data: '<p>NO DATA PRESENT</p>', forecast: ''});
         }
-        //if not present in item_id_array insert here!
-      })
-
-      //loops through list of item return from form
-      item_id_array.forEach(function(element)
-      {
-        //if there is an item that exists in the new array that doesn't exist in the old item_id_array
-        //then this is added to the database
-        if (!old_item_id_array.includes(parseInt(element[0])))
-        {
-          //remove element!
-          mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + req.body.saleID + "', '" + element[0] + "', '" + element[1] + "')");
-        }
-      });
-
-      //master sales record is then updated
-      mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
-        {
-        //page is then rendered
-        res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
-        });
-      });
-    }
-    else
-    {
-      res.redirect("/Login");
-    }
-  });
-
-  app.get("/ForecastSales", async function(req, res)
+    });
+  }
+  else
   {
     if(req.session.loggedin)
     {
@@ -1182,8 +1393,8 @@ app.get("/ForecastSales", async function(req, res)
             data.push([element.Sale_Date, element.Quantity]);
             table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
           });
-          
-          //get the google image chart URL and customize 
+
+          //get the google image chart URL and customize
           graphURL=forecast.getGraphURL(data,2)+"&chtt=Sales+Prediction+Graph&chdl=Past+Sale|Predicted+Sales&chco=ff0000,F19AFF&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
           res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
       });
@@ -1192,6 +1403,7 @@ app.get("/ForecastSales", async function(req, res)
     {
       res.redirect("/Login");
     }
+}
 });
 
 app.get("/SalesGraph", async function(req, res)
@@ -1212,10 +1424,17 @@ app.get("/SalesGraph", async function(req, res)
             data.push([element.Sale_Date, element.Quantity]);
             table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
           });
-          
-          //get the google image chart URL and customize 
-          graphURL=forecast.getGraph(data)+"&chtt=Sales+Record&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
-          res.render(path.join(__dirname + static_path + "salesGraph"), {item_id: item_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+
+          //get the google image chart URL and customize
+          graphURL=forecast.getGraphURL(data)+"&chtt=Sales+Record&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
+          if (result.length > 0)
+          {
+            res.render(path.join(__dirname + static_path + "salesGraph"), {item_id: item_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+          }
+          else
+          {
+            res.render(path.join(__dirname + static_path + "salesGraph"), {item_id: item_id, graph: graphURL, name: '', price: '', data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+          }
       });
     }
     else
@@ -1230,8 +1449,8 @@ app.get("/ForecastItemType", async function(req, res)
     var item_type_id = sanitizeHtml(req.query.itemType);
     var data = [];
     var table_string = "";
-    var graphURL="";
-      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+
+      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
         item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
         var entry;
 
@@ -1241,8 +1460,15 @@ app.get("/ForecastItemType", async function(req, res)
           data.push([element.Sale_Date, element.Quantity]);
           table_string += "<tr><td>" + element.Item_Name + "</td><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
         });
-        graphURL=forecast.getGraphURL(data,2)+"&chtt=Sales+Items+Type+Prediction&chdl=Past+Sale|Predicted+Sales&chco=ff0000,F19AFF&chxt=x,x,y,y&chxl=1:|Date|2:|1|5|10|3:|Quantity&chxp=1,50|3,50";
-        res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: graphURL, name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+
+        if (result.length > 0)
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+        }
+        else
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: '', name: entry.Item_Name, price: entry.Price, data: '<p>NO DATA PRESENT</p>', forecast: ''});
+        }
 
     });
   } else {
