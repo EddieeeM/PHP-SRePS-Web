@@ -33,6 +33,10 @@
         <input required="required" type="number" step=".01" min=".01" name="itemPrice" id="itemPrice"/>
       </p>
 
+      <p><label for="stockQuantity">Stock Quantity:</label>
+        <input required="required" type="number" min="1" name="stockQuantity" id="stockQuantity"/>
+      </p>
+
       <p><label for="itemType">Item Type:</label>
         <select name="itemType" id="itemType">
           <%- options %>

@@ -121,6 +121,11 @@ iframe
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+/* Logout Button Style */
+.logoutButton {
+  float: right;
+}
 /* END OF NAV BAR STYLE                                            */
 /*-----------------------------------------------------------------*/
 
