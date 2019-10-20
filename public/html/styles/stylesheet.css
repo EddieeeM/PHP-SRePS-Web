@@ -40,6 +40,16 @@ iframe
   width: 100%;
 }
 
+.stock_available
+{
+  color: green;
+}
+
+.no_stock_available
+{
+  color: red;
+}
+
 
 /* END OF GENERAL STYLE -------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -120,6 +130,11 @@ iframe
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
+}
+
+/* Logout Button Style */
+.logoutButton {
+  float: right;
 }
 /* END OF NAV BAR STYLE                                            */
 /*-----------------------------------------------------------------*/
