@@ -9,6 +9,10 @@
 
   <script src="/js/form_transformation.js"></script>
 
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
@@ -16,19 +20,19 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Items</h1>
+  <h1>Items Predictions</h1>
 
   <!-- Table to display Sales Record Data -->
-  <table class="table table-hover table-bordered">
+  <table id="ItemPredictionTable" class="table table-hover table-bordered">
 
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Item ID</th>
-        <th scope="col">Item Name</th>
-        <th scope="col">Item Price</th>
-        <th scope="col">Item Type</th>
-        <th scope='col'>Sales Data</th>
+        <th class="centerColText">Item ID</th>
+        <th class="centerColText">Item Name</th>
+        <th class="centerColText">Item Price</th>
+        <th class="centerColText">Item Type</th>
+        <th class="centerColText">Sales Data</th>
       </tr>
     </thead>
 
@@ -41,11 +45,11 @@
       for(var i = 0; i < ItemData.length;i++)
       { %>
         <tr>
-          <td><%= ItemData[i].Item_ID %></td>
-          <td><%= ItemData[i].Item_Name %></td>
-          <td>$ <%= ItemData[i].Price %></td>
-          <td><%= ItemData[i].item_Type %></td>
-          <td><button onclick='show_prediction(<%= ItemData[i].Item_ID %>, "itemID", "ForecastSales")'>View Predictions</button></td>
+          <td class="centerColText"><%= ItemData[i].Item_ID %></td>
+          <td class="centerColText"><%= ItemData[i].Item_Name %></td>
+          <td class="centerColText">$ <%= ItemData[i].Price %></td>
+          <td class="centerColText"><%= ItemData[i].item_Type %></td>
+          <td class="centerColText"><button onclick='show_prediction(<%= ItemData[i].Item_ID %>, "itemID", "ForecastSales")'>View Predictions</button></td>
         </tr>
     <% }
     }
@@ -67,5 +71,18 @@
   <!-- Include Footer element -->
   <br />
   <div id="footer"> </div>
+
+<script type="text/javascript">
+$(document).ready(function() 
+{
+  $('#ItemPredictionTable').dataTable(
+  {
+    "columnDefs": [
+      { "orderable": false, "targets": 4 },
+      { "searchable": false, "targets": 4 },
+    ]
+  });
+});
+</script>
 </body>
 </html>

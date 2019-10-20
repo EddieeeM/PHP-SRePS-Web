@@ -212,6 +212,12 @@ iframe
 table {
   border-collapse: collapse;
   width: 100%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.centerColText {
+  text-align: center;
 }
 
 /* Header colouring */

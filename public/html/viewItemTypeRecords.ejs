@@ -6,25 +6,30 @@
   <title>Sales Manager</title>
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
+
 </head>
 
 <body>
   <!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Item Types</h1>
+  <h1>Viewing Item Types</h1>
 
   <!-- Table to display Sales Record Data -->
-  <table class="table table-hover table-bordered">
+  <table id="ItemTypeTable" class="table table-hover table-bordered">
 
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Item Type ID</th>
-        <th scope="col">Item Type Name</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Delete</th>
-        <th scope='col'>Sales Data</th>
+        <th class="centerColText">Type ID</th>
+        <th class="centerColText">Type Name</th>
+        <th class="centerColText">Edit</th>
+        <th class="centerColText">Delete</th>
+        <th class="centerColText">Sales Data</th>
       </tr>
     </thead>
 
@@ -37,10 +42,11 @@
       for(var i = 0; i < ItemData.length; i++)
       { %>
         <tr>
-          <td><%= ItemData[i].itmType_ID %></td>
-          <td><%= ItemData[i].item_Type %></td>
+          <td class="centerColText"><%= ItemData[i].itmType_ID %></td>
+          <td class="centerColText"><%= ItemData[i].item_Type %></td>
           <td class="td-button"><a class="general-button" href='/EditItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Edit Item Type</a></td>
           <td class="td-button"><a class="general-button" href='/DeleteItemType?itemTypeID=<%= ItemData[i].itmType_ID %>'>Delete Item Type</a></td>
+          <td class="centerColText">FILLER</td>
         </tr>
     <% }
     }
@@ -48,7 +54,7 @@
     else { %>
       <tr>
         <!-- Alert the user -->
-        <td colspan="4">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+        <td colspan="5">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>
@@ -58,5 +64,20 @@
   <!-- Include Footer element -->
   <br />
   <div id="footer"> </div>
+
+
+<script type="text/javascript">
+$(document).ready(function() 
+{
+  $('#ItemTypeTable').dataTable(
+  {
+    "columnDefs": [
+      { "orderable": false, "targets": [2, 3, 4] },
+      { "searchable": false, "targets": [2, 3, 4] }
+    ]
+  });
+});
+</script>
+
 </body>
 </html>
