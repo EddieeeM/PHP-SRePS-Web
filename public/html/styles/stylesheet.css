@@ -40,6 +40,16 @@ iframe
   width: 100%;
 }
 
+.stock_available
+{
+  color: green;
+}
+
+.no_stock_available
+{
+  color: red;
+}
+
 
 /* END OF GENERAL STYLE -------------------------------------------*/
 /*-----------------------------------------------------------------*/
