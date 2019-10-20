@@ -4,6 +4,11 @@
   font-family: Calabri;
 }
 
+html
+{
+  font-family: sans-serif;
+}
+
 body {
   margin-left: 15em;
   margin-right: 15em;
