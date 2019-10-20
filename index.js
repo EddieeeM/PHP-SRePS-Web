@@ -181,11 +181,11 @@ app.post("/LoggingIn", async function(req, res){
 //LogOut Script
 app.get("/Logout", function(req,res){
 
-  if(req.session.loggedin) 
+  if(req.session.loggedin)
   {
     req.session.destroy(function (err)
     {
-      if(err) 
+      if(err)
       {
         next(err);
       } else {
@@ -1031,7 +1031,7 @@ app.get("/getItems", async function(req, res)
   if(req.session.loggedin)
   {
     var searchString = sanitizeHtml(req.query.searchString);
-    await mysql.selectData("SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + searchString + "%' GROUP BY sales_items.Item_ID, item.Item_ID").then(result => {
+    await mysql.selectData("SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + searchString + "%' GROUP BY sales_items.Item_ID, item.Item_ID").then(result => {
       res.send(result);
     });
   } else {
@@ -1044,7 +1044,7 @@ app.get("/getItemByID", async function(req, res)
   if(req.session.loggedin)
   {
     var itemID = sanitizeHtml(req.query.itemID);
-    await mysql.selectData('SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_ID = "' + itemID + '"  GROUP BY sales_items.Item_ID, item.Item_ID').then(result => {
+    await mysql.selectData('SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_ID = "' + itemID + '"  GROUP BY sales_items.Item_ID, item.Item_ID').then(result => {
       res.send(result);
     });
   } else {
