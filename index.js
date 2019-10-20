@@ -100,13 +100,12 @@ app.post("/UserRecordDeleted", async function(req, res)
   //waits for the response for database, then continues, utilizing the response string
   //deletes linked items
   await mysql.insertData("DELETE FROM user_logins WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
-  if (result)
-  {
+
     //deletes master sales record itself
     mysql.insertData("DELETE FROM users WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
       res.render(path.join(__dirname + static_path + "userRecordDeleted"), {userID: req.body.userID});
     });
-  }
+
   });
 });
 
