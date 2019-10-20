@@ -129,6 +129,85 @@ app.post("/RegisteredResult", async function(req, res){
   });
 });
 
+app.get("/DeleteUserRecord", async function(req, res)
+{
+  var userID = req.query.userID;
+
+  mysql.selectData("SELECT * FROM users WHERE User_ID = '" + userID +
+  "'").then(userResult =>
+  {
+    var user_obj;
+    userResult.forEach(function(element)
+    {
+      user_obj = element;
+      //renders ejs doc as html, replace document variables with options for the select field
+    });
+
+    res.render(path.join(__dirname + static_path + "deleteUser"), {userID: user_obj.User_ID, userName: user_obj.FirstName, userIDValue: user_obj.User_ID});
+  });
+});
+
+app.post("/UserRecordDeleted", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  //deletes linked items
+  await mysql.insertData("DELETE FROM user_logins WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
+
+    //deletes master sales record itself
+    mysql.insertData("DELETE FROM users WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
+      res.render(path.join(__dirname + static_path + "userRecordDeleted"), {userID: req.body.userID});
+    });
+
+  });
+});
+
+
+app.get("/ViewUsers", async function(req, res)
+{
+  // Querey database and wait for result response
+  // Returns ALL sales records and passes in array
+  await mysql.selectData("SELECT * FROM users").then(result => {
+
+    // Render view and pass result of query to be displayed
+    res.render(path.join(__dirname + static_path + "viewUsers"), {UserData: result});
+  });
+});
+
+app.get("/EditUserDetails", async function(req, res)
+{
+  var userID = req.query.userID;
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.selectData("SELECT * FROM users JOIN user_logins ON users.User_ID = user_logins.User_ID WHERE users.User_ID = '" + userID + "'").then(result =>
+    {
+        var user_obj;
+
+        result.forEach(function(element)
+        {
+          user_obj = element;
+        });
+
+        res.render(path.join(__dirname + static_path + "editUserDetails"), {userID: userID, FirstName: user_obj.FirstName, LastName: user_obj.LastName, Email: user_obj.Email, UserName: user_obj.Username});
+      });
+});
+
+app.post("/UserDetailsEdited", async function(req, res)
+{
+  //waits for the response for database, then continues, utilizing the response string
+  await mysql.insertData("UPDATE users SET FirstName = '" + req.body.FirstName + "', LastName = '" + req.body.LastName +
+    "', Email = '" + req.body.Email + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+  if (result)
+  {
+    mysql.insertData("UPDATE user_logins SET UserName = '" + req.body.UserName + "', Password = '" + req.body.Password + "' WHERE User_ID = '" + req.body.userID + "'").then(result => {
+      if (result)
+      {
+        res.render(path.join(__dirname + static_path + "UserDetailsEdited"), {UserID: req.body.userID, FirstName: req.body.FirstName, LastName: req.body.LastName, Email: req.body.Email});
+      }
+    });
+  }
+  });
+});
+
+
 //User Login
 app.get("/Login", function(req, res){
 
@@ -193,7 +272,7 @@ app.get("/Logout", function(req,res){
       }
     })
   }
-})
+});
 
 app.get("/AddItemType", function(req, res)
 {
@@ -593,6 +672,11 @@ app.get("/ManageItems", function(req, res)
   } else {
     res.redirect("/Login");
   }
+});
+
+app.get("/ManageUsers", function(req, res)
+{
+  res.render(path.join(__dirname + static_path + "manageUsers"));
 });
 
 app.get("/ManageItemTypes", function(req, res)
