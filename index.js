@@ -505,7 +505,29 @@ app.get("/DownloadCSV", async function(req, res)
         end_date = end_date + "-00";
       }
 
-      var output_string = "";
+      var data = [];
+      var entry;
+
+      result.forEach(function(element)
+      {
+        entry = element;
+        data.push([element.Sale_Date, element.Quantity]);
+      });
+
+      result.forEach(function(element)
+      {
+        output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
+          element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date;
+
+          if (prediction == "true")
+          {
+            output_string += "," + forecast.predictSales(data, 2) + '\n';
+          }
+          else
+          {
+            output_string += '\n';
+          }
+      });
 
       if (end_date.length > 0)
       {
@@ -547,10 +569,30 @@ app.get("/DownloadCSV", async function(req, res)
         await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
           start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
+          var data = [];
+          var entry;
+
+          result.forEach(function(element)
+          {
+            entry = element;
+            data.push([element.Sale_Date, element.Quantity]);
+          });
+
+
           result.forEach(function(element)
           {
             output_string += element.Sale_ID + "," + element.Quantity + "," + element.Item_ID + "," + element.Item_Name + "," +
-              element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date + '\n';});
+              element.itmType_ID + "," + element.item_Type + ","+ element.Sale_Date;
+
+              if (prediction == "true")
+              {
+                output_string += "," + forecast.predictSales(data, 2) + '\n';
+              }
+              else
+              {
+                output_string += '\n';
+              }
+          });
 
           if (output_string.length == 0)
           {
@@ -572,8 +614,9 @@ app.get("/DownloadCSV", async function(req, res)
       res.set('Content-Type', 'text/csv');
       res.status(200).send(output_string);
   }
-  else {
-    //res.redirect("/Login");
+  else
+  {
+    res.redirect("/Login");
   }
 })
 
@@ -594,6 +637,7 @@ app.get("/DisplaySalesReport", async function(req, res)
   {
     var start_date = sanitizeHtml(req.query.startDate);
     var end_date = sanitizeHtml(req.query.endDate);
+    var prediction = req.query.displayPredictions;
 
     start_date = start_date + "-00";
 
@@ -610,9 +654,31 @@ app.get("/DisplaySalesReport", async function(req, res)
       await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
         start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date)").then(result => {
 
+          var data = [];
+          var entry;
+
+          result.forEach(function(element)
+          {
+            entry = element;
+            data.push([element.Sale_Date, element.Quantity]);
+          });
+
         result.forEach(function(element)
         {
-          output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+          output_string += "<tr><td>" + element.Sale_ID +
+          "</td><td>" + element.Quantity +
+          "</td><td>" + element.Item_ID +
+          "</td><td>" + element.Item_Name +
+          "</td><td>" + element.Sale_Date;
+
+          if (prediction == "true")
+          {
+            output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+          }
+          else
+          {
+            output_string += "</td></tr>";
+          }
         });
 
         if (output_string.length == 0)
@@ -624,8 +690,8 @@ app.get("/DisplaySalesReport", async function(req, res)
     else
     {
       //waits for the response for database, then continues, utilizing the response string
-      var month = start_date.split("-")[1];
-      var year = start_date.split("-")[0];
+      var month = req.query.startDate.split("-")[1];
+      var year = req.query.startDate.split("-")[0];
       var month = parseInt(month) + 1;
 
       if (month < 10)
@@ -643,10 +709,32 @@ app.get("/DisplaySalesReport", async function(req, res)
       await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID JOIN item_types ON item_types.itmType_ID = item.itmType_ID WHERE sales.Sale_Date >= CONVERT('" +
         start_date + "', date) AND sales.Sale_Date <= CONVERT('" + final_start_date + "', date)").then(result => {
 
+        var data = [];
+        var entry;
+
         result.forEach(function(element)
         {
-          output_string += "<tr><td>" + element.Sale_ID + "</td><td>" + element.Quantity + "</td><td>" + element.Item_ID + "</td><td>" + element.Item_Name + "</td><td>" + element.Sale_Date + "</td></tr>";
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
         });
+
+        result.forEach(function(element)
+        {
+          output_string += "<tr><td>" + element.Sale_ID +
+          "</td><td>" + element.Quantity +
+          "</td><td>" + element.Item_ID +
+          "</td><td>" + element.Item_Name +
+          "</td><td>" + element.Sale_Date;
+        });
+
+        if (prediction == "true")
+        {
+          output_string += "</td><td>" + forecast.predictSales(data, 2) + "</td></tr>";
+        }
+        else
+        {
+          output_string += "</td></tr>";
+        }
 
         if (output_string.length == 0)
         {
@@ -745,6 +833,7 @@ app.get("/ViewStockLevels", async function(req, res)
           res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
         });
       }
+
       // Query database and wait for result response
       // Returns ALL sales records and passes in array
       // Querey database and wait for result response
@@ -1099,7 +1188,7 @@ app.get("/ViewSaleRecords", async function(req, res)
   {
     // Query database and wait for result response
     // Returns ALL sales records and passes in array
-    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID").then(result => {
+    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON item.Item_ID = sales_items.Item_ID ORDER BY sales.Sale_Date").then(result => {
 
       // Render view and pass result of query to be displayed
       res.render(path.join(__dirname + static_path + "ViewSaleRecords"), {SalesData: result});
@@ -1259,89 +1348,37 @@ app.post("/SalesEdited", async function(req, res)
 
 app.get("/ForecastSales", async function(req, res)
 {
-  var item_id = sanitizeHtml(req.query.itemID);
-  var data = [];
-  var table_string = "";
   if(req.session.loggedin)
   {
+    var item_id = req.query.itemID;
+    var data = [];
+    var table_string = "";
 
-    await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-      item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
-      var entry;
+      await mysql.selectData("SELECT * FROM sales RIGHT JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+        item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+        var entry;
 
-      result.forEach(function(element)
-      {
-        //adds ID of old element to array
-        old_item_id_array.push(parseInt(element.Item_ID));
-        //filters entry, producing an array
-        //return array, indicates array returned from form, includes a currrent sales item
-        var filter_entries = item_id_array.filter(i => parseInt(i[0]) == parseInt(element.Item_ID));
-
-        //if it doesn't contain the item, it is deleted
-        if (filter_entries.length == 0)
+        result.forEach(function(element)
         {
-          mysql.insertData("DELETE FROM sales_items WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'");
+          entry = element;
+          data.push([element.Sale_Date, element.Quantity]);
+          table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
+        });
+
+        if (result.length > 0)
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
         }
         else
         {
-          //if it does contain the item, it is updated with returned form details
-          mysql.insertData("UPDATE sales_items SET Quantity = '" + filter_entries[0][1] + "' WHERE Sale_ID = '" + req.body.saleID + "' AND Item_ID = '" + element.Item_ID + "'")
+          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: '', name: '', price: '', data: '<p>NO DATA PRESENT</p>', forecast: ''});
         }
-        //if not present in item_id_array insert here!
-      })
-
-      //loops through list of item return from form
-      item_id_array.forEach(function(element)
-      {
-        //if there is an item that exists in the new array that doesn't exist in the old item_id_array
-        //then this is added to the database
-        if (!old_item_id_array.includes(parseInt(element[0])))
-        {
-          //remove element!
-          mysql.insertData("INSERT INTO sales_items (Sale_ID, Item_ID, Quantity) VALUES ('" + req.body.saleID + "', '" + element[0] + "', '" + element[1] + "')");
-        }
-      });
-
-      //master sales record is then updated
-      mysql.selectData("UPDATE sales SET Sale_Date = '" + req.body.salesDate + "' WHERE Sale_ID = '" + req.body.saleID + "'").then(result =>
-        {
-        //page is then rendered
-        res.render(path.join(__dirname + static_path + "SalesEdited"), {saleID: req.body.saleID});
-        });
-      });
-    }
-    else
-    {
-      res.redirect("/Login");
-    }
-  });
-
-  app.get("/ForecastSales", async function(req, res)
+    });
+  }
+  else
   {
-    if(req.session.loggedin)
-    {
-      var item_id = req.query.itemID;
-      var data = [];
-      var table_string = "";
-
-        await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-          item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
-          var entry;
-
-          result.forEach(function(element)
-          {
-            entry = element;
-            data.push([element.Sale_Date, element.Quantity]);
-            table_string += "<tr><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
-          });
-
-          res.render(path.join(__dirname + static_path + "forecastForItem"), {item_id: item_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
-      });
-    }
-    else
-    {
-      res.redirect("/Login");
-    }
+    res.redirect("/Login");
+  }
 });
 
 app.get("/ForecastItemType", async function(req, res)
@@ -1352,7 +1389,7 @@ app.get("/ForecastItemType", async function(req, res)
     var data = [];
     var table_string = "";
 
-      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
         item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
         var entry;
 
@@ -1363,7 +1400,14 @@ app.get("/ForecastItemType", async function(req, res)
           table_string += "<tr><td>" + element.Item_Name + "</td><td>" + element.Sale_Date +"</td><td>" + element.Quantity + "</td></tr>";
         });
 
-        res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+        if (result.length > 0)
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: forecast.getGraphURL(data, 2), name: entry.Item_Name, price: entry.Price, data: HTMLParser.parse(table_string), forecast: forecast.predictSales(data, 2)});
+        }
+        else
+        {
+          res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: '', name: entry.Item_Name, price: entry.Price, data: '<p>NO DATA PRESENT</p>', forecast: ''});
+        }
 
     });
   } else {
