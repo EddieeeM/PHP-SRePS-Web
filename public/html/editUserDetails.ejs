@@ -10,6 +10,52 @@
         <script src="/js/jquery-3.4.1.min.js"></script>
         <script src="/js/loadhtml.js"></script>
         <link href="/html/styles/stylesheet.css" rel="stylesheet" />
+				<script>
+					function displayLoginDetails()
+					{
+						if ($("#login_details").is(":hidden"))
+						{
+							$("#login_details").show();
+						}
+						else
+						{
+							$("#login_details").hide();
+						}
+					}
+
+					function checkPassword()
+					{
+						var password = $("#Password").val();
+						var cnfm_password = $("#CnfmPassword").val();
+
+						if (cnfm_password.length > 0 && password.length)
+						{
+							if (cnfm_password != password)
+							{
+								$("#password_validation").html("Ensure that the Password and Confirm Password Match");
+								return false;
+							}
+							else
+							{
+								$("#password_validation").html("");
+								return true;
+							}
+						}
+					}
+
+					function checkform()
+					{
+						if (checkPassword())
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					}
+
+				</script>
 	</head>
 
 	<body>
@@ -17,8 +63,8 @@
     </div>
 
     <h1>Edit User Details</h1>
-
-		<form action="/UserDetailsEdited" method="POST">
+    
+		<form action="/UserDetailsEdited" method="POST" onsubmit="return checkPassword()">
         <fieldset>
           <legend>User Information</legend>
 					<input hidden id='userID' name='userID' value='<%= userID %>'/>
@@ -34,6 +80,24 @@
           <p><label for="Email">Email</label>
               <input type="text" name="Email" id="Email" placeholder="Enter Email" required value= '<%= Email %>'/>
           </p>
+
+					<button type="button" name="button" onclick="displayLoginDetails()" class="formBtn">Show/Hide Login Details</button>
+
+					<div id ="login_details" hidden>
+						<p><label for="UserName">User Name</label>
+								<input type="text" name="UserName" id="UserName" placeholder="Enter User Name" required value= '<%= UserName %>'/>
+						</p>
+
+						<p><label for="Password">Password</label>
+								<input type="password" name="Password" id="Password" placeholder="Enter Password" onkeyup="checkPassword()" value= ''/>
+						</p>
+
+						<p><label for="CnfmPassword">Confirm Password</label>
+								<input type="password" name="CnfmPassword" id="CnfmPassword" placeholder="Enter Confirm Password" onkeyup="checkPassword()" value= ''/>
+						</p>
+
+						<p id="password_validation"></p>
+					</div>
         </fieldset>
 
         <input type="submit" class="formBtn" />

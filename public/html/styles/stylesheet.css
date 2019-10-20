@@ -4,6 +4,11 @@
   font-family: Calabri;
 }
 
+html
+{
+  font-family: sans-serif;
+}
+
 body {
   margin-left: 15em;
   margin-right: 15em;
@@ -133,7 +138,7 @@ iframe
 }
 
 /* Logout Button Style */
-.logoutButton {
+.rightAlign {
   float: right;
 }
 /* END OF NAV BAR STYLE                                            */
@@ -218,6 +223,12 @@ iframe
 table {
   border-collapse: collapse;
   width: 100%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.centerColText {
+  text-align: center;
 }
 
 /* Header colouring */

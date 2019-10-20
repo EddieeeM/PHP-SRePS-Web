@@ -7,26 +7,31 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
 
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.20/sorting/datetime-moment.js"></script>
+
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
 
 <body>
-	<!-- Include Header element -->
+  <!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Sales</h1>
-  
+  <h1>Viewing Sales</h1>
+
   <!-- Table to display Sales Record Data -->
-  <table class="table table-hover table-bordered">
+  <table id="SalesTable" class="table table-hover table-bordered">
 
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Sale ID</th>
-        <th scope="col">Sale Date</th>
-        <th scope="col">Item Info</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Delete</th>
+        <th class="centerColText">Sale ID</th>
+        <th class="centerColText">Sale Date</th>
+        <th>Item Info</th>
+        <th class="centerColText">Edit</th>
+        <th class="centerColText">Delete</th>
       </tr>
     </thead>
 
@@ -57,8 +62,8 @@
           %>
                   
           <tr>
-            <td><%= SalesData[i - 1].Sale_ID %></td>
-            <td><%= SalesData[i - 1].Sale_Date %></td>
+            <td class="centerColText"><%= SalesData[i - 1].Sale_ID %></td>
+            <td class="centerColText"><%= SalesData[i - 1].Sale_Date %></td>
             <td><%= items_string %></td>
             <td class="td-button"><a class="general-button" href="/EditSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Edit</a></td>
             <td class="td-button"><a class="general-button" href="/DeleteSalesRecord?saleID=<%= SalesData[i-1].Sale_ID %>">Delete</a></td>
@@ -86,8 +91,8 @@
           %>
 
           <tr>
-            <td><%= SalesData[i].Sale_ID %></td>
-            <td><%= SalesData[i].Sale_Date %></td>
+            <td class="centerColText"><%= SalesData[i].Sale_ID %></td>
+            <td class="centerColText"><%= SalesData[i].Sale_Date %></td>
             <td><%= items_string %></td>
             <td class="td-button"><a class="general-button" href="/EditSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Edit</a></td>
             <td class="td-button"><a class="general-button" href="/DeleteSalesRecord?saleID=<%= SalesData[i].Sale_ID %>">Delete</a></td>
@@ -99,7 +104,7 @@
     <!-- Else there is no table data -->
     else { %>
       <tr>
-      	<!-- Alert the user -->
+        <!-- Alert the user -->
         <td colspan="5">NO SALES DATA FOUND - Add Sales records to database and they will display here</td>
       </tr>
     <% }
@@ -110,5 +115,46 @@
   <!-- Include Footer element -->
   <br />
   <div id="footer"> </div>
+
+
+<script type="text/javascript">
+
+var timeFormat = "DD/MM/YYYY"
+
+$.fn.dataTable.moment = function ( format, locale ) 
+{
+  var types = $.fn.dataTable.ext.type;
+
+  // Add type detection
+  types.detect.unshift( function ( d ) {
+      return moment( d, format, locale, true ).isValid() ?
+          'moment-'+format :
+          null;
+  } );
+
+  // Add sorting method - use an integer for the sorting
+  types.order[ 'moment-'+format+'-pre' ] = function ( d ) {
+      return moment( d, format, locale, true ).unix();
+  };
+};
+
+
+$(document).ready(function() 
+{
+  $.fn.dataTable.moment(timeFormat);
+  $('#SalesTable').dataTable(
+  {
+    "columnDefs": [
+      { "orderable": false, "targets": [2, 3, 4] },
+      { "searchable": false, "targets": [3, 4] },
+      { targets:1, render:function(data)
+        {
+          return moment(data, '').format(timeFormat);
+        }
+      }
+    ]
+  });
+});
+</script>
 </body>
 </html>

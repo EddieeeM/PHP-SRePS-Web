@@ -7,6 +7,9 @@
   <script src="/js/jquery-3.4.1.min.js"></script>
   <script src="/js/loadhtml.js"></script>
 
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
@@ -14,23 +17,23 @@
 <body>
 	<!-- Include Header element -->
   <div class="navbar" id="navbar"></div>
-  <h1>Items</h1>
+  <h1>View Items</h1>
   <a href='/ManageItems'><p>< Item Management</p></a>
 
   <!-- Table to display Sales Record Data -->
-  <table class="table table-hover table-bordered">
+  <table id="ItemTable" class="table table-hover table-bordered">
 
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Item ID</th>
-        <th scope="col">Item Name</th>
-        <th scope="col">Item Price</th>
-        <th scope="col">Item Type</th>
-        <th scope="col">Stock Quantity</th>
-        <th scope='col'>Sales Data</th>
-        <th scope='col'>Edit Item</th>
-        <th scope='col'>Delete Item</th>
+        <th class="centerColText">Item ID</th>
+        <th class="centerColText">Name</th>
+        <th class="centerColText">Price</th>
+        <th class="centerColText">Type</th>
+        <th class="centerColText">Quantity</th>
+        <th class="centerColText">Sales Data</th>
+        <th class="centerColText">Edit</th>
+        <th class="centerColText">Delete</th>
 
       </tr>
     </thead>
@@ -44,15 +47,14 @@
       for(var i = 0; i < ItemData.length; i++)
       { %>
         <tr>
-          <td><%= ItemData[i].Item_ID %></td>
-          <td><%= ItemData[i].Item_Name %></td>
-          <td><%= ItemData[i].Price %></td>
-          <td><%= ItemData[i].item_Type %></td>
-          <td><%= ItemData[i].stockQuantity%></td>
-
-          <td class="td-button"><a class="general-button" href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit Item</a></td>
-          <td class="td-button"><a class="general-button" href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete Item</a></td>
-          <td><a href='/ForecastSales?itemID=<%= ItemData[i].Item_ID %>'>View Sales/Prediction</a></td>
+          <td class="centerColText"><%= ItemData[i].Item_ID %></td>
+          <td class="centerColText"><%= ItemData[i].Item_Name %></td>
+          <td class="centerColText"><%= ItemData[i].Price %></td>
+          <td class="centerColText"><%= ItemData[i].item_Type %></td>
+          <td class="centerColText"><%= ItemData[i].stockQuantity%></td>
+          <td class="td-button"><a class="general-button" href='/ForecastSales?itemID=<%= ItemData[i].itmType_ID %>'>Prediction</a></td>
+          <td class="td-button"><a class="general-button" href='/EditItem?itemID=<%= ItemData[i].Item_ID %>'>Edit</a></td>
+          <td class="td-button"><a class="general-button" href='/DeleteItem?itemID=<%= ItemData[i].Item_ID %>'>Delete</a></td>
 
         </tr>
     <% }
@@ -61,7 +63,7 @@
     else { %>
       <tr>
       	<!-- Alert the user -->
-        <td colspan="6">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+        <td colspan="8">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>
@@ -71,5 +73,20 @@
   <!-- Include Footer element -->
   <br />
   <div id="footer"> </div>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() 
+{
+  $('#ItemTable').dataTable(
+  {
+    "columnDefs": [
+      { "orderable": false, "targets": [5, 6, 7] },
+      { "searchable": false, "targets": [5, 6, 7] },
+    ]
+  });
+});
+</script>
 </body>
 </html>

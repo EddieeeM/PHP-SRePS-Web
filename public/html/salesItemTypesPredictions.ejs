@@ -9,6 +9,9 @@
 
   <script src="/js/form_transformation.js"></script>
 
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
   <!-- All CSS for this webpage can be found in a section in the stylesheet -->
   <link href="html/styles/stylesheet.css" rel="stylesheet" />
 </head>
@@ -19,14 +22,14 @@
   <h1>Item Type Predictions</h1>
 
   <!-- Table to display Sales Record Data -->
-  <table class="table table-hover table-bordered">
+  <table id="TypePredictionTable" class="table table-hover table-bordered">
 
     <!-- Hard coded table headers -->
     <thead>
       <tr>
-        <th scope="col">Item Type ID</th>
-        <th scope="col">Item Type Name</th>
-        <th scope='col'>Sales Data</th>
+        <th class="centerColText">Item Type ID</th>
+        <th class="centerColText">Item Type Name</th>
+        <th class="centerColText">Sales Data</th>
       </tr>
     </thead>
 
@@ -39,9 +42,9 @@
       for(var i = 0; i < ItemData.length;i++)
       { %>
         <tr>
-          <td><%= ItemData[i].itmType_ID %></td>
-          <td><%= ItemData[i].item_Type %></td>
-          <td><button class="formBtn" onclick='show_prediction(<%= ItemData[i].itmType_ID %>, "itemType", "ForecastItemType")'>View Predictions</button></td>
+          <td class="centerColText"><%= ItemData[i].itmType_ID %></td>
+          <td class="centerColText"><%= ItemData[i].item_Type %></td>
+          <td class="centerColText"><button class="formBtn" onclick='show_prediction(<%= ItemData[i].itmType_ID %>, "itemType", "ForecastItemType")'>View Predictions</button></td>
         </tr>
     <% }
     }
@@ -63,5 +66,18 @@
   <!-- Include Footer element -->
   <br />
   <div id="footer"> </div>
+
+<script type="text/javascript">
+$(document).ready(function() 
+{
+  $('#TypePredictionTable').dataTable(
+  {
+    "columnDefs": [
+      { "orderable": false, "targets": 2 },
+      { "searchable": false, "targets": 2 },
+    ]
+  });
+});
+</script>
 </body>
 </html>
