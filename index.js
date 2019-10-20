@@ -790,8 +790,8 @@ app.get("/ViewStockLevels", async function(req, res)
         {
           case "all":
             await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
-              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
-              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "RIGHT JOIN sales ON sales_items.Sale_ID = sales.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
               "GROUP BY (sales_items.Item_ID) HAVING item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
             {
               // Render view and pass result of query to be displayed
@@ -801,8 +801,8 @@ app.get("/ViewStockLevels", async function(req, res)
 
           case "pos":
             await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
-              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
-              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "RIGHT JOIN sales ON sales_items.Sale_ID = sales.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
               "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining > 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
             {
               // Render view and pass result of query to be displayed
@@ -812,8 +812,8 @@ app.get("/ViewStockLevels", async function(req, res)
 
           case "neg":
             await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
-              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
-              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "RIGHT JOIN sales ON sales_items.Sale_ID = sales.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
               "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining <= 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
             {
               // Render view and pass result of query to be displayed
@@ -825,8 +825,8 @@ app.get("/ViewStockLevels", async function(req, res)
       else
       {
         await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
-          "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
-          "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+          "RIGHT JOIN sales ON sales_items.Sale_ID = sales.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID " +
+          "RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
           "GROUP BY (sales_items.Item_ID) ORDER BY itemsRemaining DESC").then(result =>
         {
           // Render view and pass result of query to be displayed

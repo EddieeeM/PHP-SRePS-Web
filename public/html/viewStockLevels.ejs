@@ -60,30 +60,44 @@
     <% if(ItemData.length) {
       <!-- Create table entry for each observation -->
       for(var i = 0; i < ItemData.length; i++)
-      { %>
+      {
+        var items_sold = ItemData[i].itemsSold;
+        var items_remaining = ItemData[i].itemsRemaining;
+
+        if (items_sold == null)
+        {
+          items_sold = 0;
+        }
+
+        if (items_remaining == null)
+        {
+          items_remaining = ItemData[i].stockQuantity;
+        }
+
+        %>
         <tr>
           <td><%= ItemData[i].Item_ID %></td>
           <td><%= ItemData[i].Item_Name %></td>
           <td><%= ItemData[i].item_Type %></td>
           <td><%= ItemData[i].stockQuantity %></td>
-          <td><%= ItemData[i].itemsSold %></td>
+          <td><%= items_sold %></td>
           <%
-            if (ItemData[i].itemsRemaining > 0)
+            if (items_remaining > 0)
             {
               %>
-              <td class='stock_available'><%= ItemData[i].itemsRemaining %></td>
+              <td class='stock_available'><%= items_remaining %></td>
               <%
             }
-            else if (ItemData[i].itemsRemaining == 0)
+            else if (items_remaining == 0)
             {
               %>
-              <td><%= ItemData[i].itemsRemaining %></td>
+              <td><%= items_remaining %></td>
               <%
             }
             else
             {
               %>
-              <td class="no_stock_available"><%= ItemData[i].itemsRemaining %></td>
+              <td class="no_stock_available"><%= items_remaining %></td>
               <%
             }
           %>
@@ -96,7 +110,7 @@
     else { %>
       <tr>
       	<!-- Alert the user -->
-        <td colspan="6">NO ITEM DATA FOUND - Add Item records to database and they will display here</td>
+        <td colspan="6">NO SALES DATA FOUND - Add Item records to database and they will display here</td>
       </tr>
     <% }
     %>
