@@ -151,13 +151,13 @@ app.post("/UserRecordDeleted", async function(req, res)
 {
   //waits for the response for database, then continues, utilizing the response string
   //deletes linked items
+
   await mysql.insertData("DELETE FROM user_logins WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
 
     //deletes master sales record itself
     mysql.insertData("DELETE FROM users WHERE User_ID =  ('" + req.body.userID + "');").then(result => {
       res.render(path.join(__dirname + static_path + "userRecordDeleted"), {userID: req.body.userID});
     });
-
   });
 });
 
@@ -177,7 +177,8 @@ app.get("/EditUserDetails", async function(req, res)
 {
   var userID = req.query.userID;
   //waits for the response for database, then continues, utilizing the response string
-  await mysql.selectData("SELECT * FROM users JOIN user_logins ON users.User_ID = user_logins.User_ID WHERE users.User_ID = '" + userID + "'").then(result =>
+
+    await mysql.selectData("SELECT * FROM users JOIN user_logins ON users.User_ID = user_logins.User_ID WHERE users.User_ID = '" + userID + "'").then(result =>
     {
         var user_obj;
 
@@ -258,6 +259,7 @@ app.post("/LoggingIn", async function(req, res){
 });
 
 //LogOut Script
+
 app.get("/Logout", function(req,res){
 
   if(req.session.loggedin)
