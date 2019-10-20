@@ -30,7 +30,7 @@ exports.predictSales = function(input_data, smoothing_amount)
         // For each coefficient, we substract from "forecast" the value of the "N - x" datapoint's value, multiplicated by the coefficient, where N is the last known datapoint value, and x is the coefficient's index.
     }
 
-    return forecast;
+    return Math.round(forecast);
   }
   else
   {
