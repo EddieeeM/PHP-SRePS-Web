@@ -681,6 +681,74 @@ app.get("/ManageItemTypes", function(req, res)
 });
 
 // View Items page
+app.get("/ViewStockLevels", async function(req, res)
+{
+    if(req.session.loggedin)
+    {
+      if (req.query.item_subset != null)
+      {
+        var search_string = req.query.item_string;
+
+        switch (req.query.item_subset)
+        {
+          case "all":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+
+          case "pos":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining > 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+
+          case "neg":
+            await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+              "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+              "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+              "GROUP BY (sales_items.Item_ID) HAVING itemsRemaining <= 0 AND item.Item_Name LIKE '%" + search_string + "%' ORDER BY itemsRemaining DESC").then(result =>
+            {
+              // Render view and pass result of query to be displayed
+              res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+            });
+            break;
+        }
+      }
+      else
+      {
+        await mysql.selectData("SELECT *, SUM(sales_items.Quantity) as itemsSold, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining FROM sales_items " +
+          "JOIN sales ON sales_items.Sale_ID = sales.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID " +
+          "JOIN item_types ON item.itmType_ID = item_types.itmType_ID " +
+          "GROUP BY (sales_items.Item_ID) ORDER BY itemsRemaining DESC").then(result =>
+        {
+          // Render view and pass result of query to be displayed
+          res.render(path.join(__dirname + static_path + "ViewStockLevels"), {ItemData: result});
+        });
+      }
+      // Query database and wait for result response
+      // Returns ALL sales records and passes in array
+      // Querey database and wait for result response
+      // Returns ALL sales records and passes in array
+      //Orders by Item ID
+  }
+  else
+  {
+    res.redirect("/Login");
+  }
+});
+
+// View Items page
 app.get("/ViewItemRecords", async function(req, res)
 {
     if(req.session.loggedin)
@@ -1038,7 +1106,7 @@ app.get("/getItems", async function(req, res)
   if(req.session.loggedin)
   {
     var searchString = sanitizeHtml(req.query.searchString);
-    await mysql.selectData("SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_Name LIKE '%" + searchString + "%'").then(result => {
+    await mysql.selectData("SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_Name LIKE '%" + searchString + "%' GROUP BY sales_items.Item_ID, item.Item_ID").then(result => {
       res.send(result);
     });
   } else {
@@ -1051,7 +1119,7 @@ app.get("/getItemByID", async function(req, res)
   if(req.session.loggedin)
   {
     var itemID = sanitizeHtml(req.query.itemID);
-    await mysql.selectData('SELECT * FROM item JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.Item_ID = "' + itemID + '"').then(result => {
+    await mysql.selectData('SELECT *, (item.stockQuantity - SUM(sales_items.Quantity)) as itemsRemaining, SUM(sales_items.Quantity) as itemsSold FROM sales_items JOIN item ON sales_items.Item_ID = item.Item_ID WHERE item.Item_ID = "' + itemID + '"  GROUP BY sales_items.Item_ID, item.Item_ID').then(result => {
       res.send(result);
     });
   } else {
