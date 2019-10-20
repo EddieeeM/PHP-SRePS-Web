@@ -20,7 +20,7 @@
   </div>
   <h1>Generate Sales Records</h1>
 
-  <form id="generateSalesForm" action="/DisplaySalesReport" method="get">    <!-- TODO:Decide on a actoin page  -->
+  <form id="generateSalesForm" action="/DisplaySalesReport" method="get">
 
     <fieldset>
       <legend>Sales Information</legend>
@@ -33,7 +33,7 @@
         <input type="month" required name="startDate" id="startDate"/>
       </p>
 
-      <button type="button" name="button" onclick="displayRangeRange()">Choose Date Range</button>
+      <button type="button" class="formBtn" name="button" onclick="displayRangeRange()">Choose Date Range</button>
 
       <p id="extended_range" hidden><label for="endDate">End Month/Year:</label>
         <input type="month" name="endDate" id="endDate"/>
