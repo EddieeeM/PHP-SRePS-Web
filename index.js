@@ -1452,7 +1452,7 @@ app.get("/ForecastItemType", async function(req, res)
     var data = [];
     var table_string = "";
 
-      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID RIGHT JOIN item ON sales_items.Item_ID = item.Item_ID RIGHT JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
         item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
         var entry;
 
@@ -1469,7 +1469,14 @@ app.get("/ForecastItemType", async function(req, res)
         }
         else
         {
-          res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: '', name: entry.Item_Name, price: entry.Price, data: '<p>NO DATA PRESENT</p>', forecast: ''});
+          try
+          {
+            res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: '', name: entry.Item_Name, price: entry.Price, data: '<p>NO DATA PRESENT</p>', forecast: ''});
+          }
+          catch (error)
+          {
+            res.render(path.join(__dirname + static_path + "forecastForItemType"), {item_type_id: item_type_id, graph: '', name: '', price: '', data: '<p>NO DATA PRESENT</p>', forecast: ''});
+          }
         }
 
     });
