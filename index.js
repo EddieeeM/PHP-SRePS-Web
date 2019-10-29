@@ -1424,27 +1424,45 @@ app.get("/SalesGraph", async function(req, res)
 
       if (start_date != null)
       {
-        if (end_date != null)
+        if (start_date.length == 0)
+        {
+          start_date = null;
+        }
+      }
+
+      if (end_date != null)
+      {
+        if (end_date.length == 0)
+        {
+          end_date = null;
+        }
+      }
+
+      if (start_date != null)
+      {
+        if (end_date == null)
         {
           sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-            item_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) ORDER BY sales.Sale_Date ASC";
+            item_id + "' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) ORDER BY sales.Sale_Date ASC";
         }
         else
         {
           sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-            item_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+            item_id + "' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date) ORDER BY sales.Sale_Date ASC";
         }
       }
       else if (end_date != null)
       {
         sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-          item_id + "' AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+          item_id + "' AND sales.Sale_Date <= CONVERT('" + end_date + "', date) ORDER BY sales.Sale_Date ASC";
       }
       else
       {
         sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
           item_id + "' ORDER BY sales.Sale_Date ASC";
       }
+
+      console.log(sql_string);
 
         await mysql.selectData(sql_string).then(result => {
           var entry;
@@ -1488,22 +1506,46 @@ app.get("/ForecastItemType", async function(req, res)
 
     if (start_date != null)
     {
+      if (start_date.length == 0)
+      {
+        start_date = null;
+      }
+    }
 
-      if (end_date != null)
+    if (end_date != null)
+    {
+      if (end_date.length == 0)
+      {
+        end_date = null;
+      }
+    }
+
+    if (start_date != null)
+    {
+
+      if (end_date == null)
       {
         sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
-          item_type_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) ORDER BY sales.Sale_Date ASC";
+          item_type_id + "' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) ORDER BY sales.Sale_Date ASC";
       }
       else
       {
-        sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
-          item_type_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+        if (end_date != 'null')
+        {
+          sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+            item_type_id + "' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) AND sales.Sale_Date <= CONVERT('" + end_date + "', date) ORDER BY sales.Sale_Date ASC";
+        }
+        else
+        {
+          sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+            item_type_id + "' AND sales.Sale_Date >= CONVERT('" + start_date + "', date) ORDER BY sales.Sale_Date ASC";
+        }
       }
     }
     else if (end_date != null)
     {
       sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
-        item_type_id + "' AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+        item_type_id + "' AND sales.Sale_Date <= CONVERT('" + end_date + "', date) ORDER BY sales.Sale_Date ASC";
     }
     else
     {
