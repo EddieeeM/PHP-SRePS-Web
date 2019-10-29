@@ -1416,8 +1416,37 @@ app.get("/SalesGraph", async function(req, res)
       var data = [];
       var table_string = "";
       var graphURL="";
-        await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
-          item_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+
+      var start_date = req.query.start_date;
+      var end_date = req.query.end_date;
+
+      var sql_string = "";
+
+      if (start_date != null)
+      {
+        if (end_date != null)
+        {
+          sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+            item_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) ORDER BY sales.Sale_Date ASC";
+        }
+        else
+        {
+          sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+            item_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+        }
+      }
+      else if (end_date != null)
+      {
+        sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+          item_id + "' AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+      }
+      else
+      {
+        sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID WHERE sales_items.Item_ID = '" +
+          item_id + "' ORDER BY sales.Sale_Date ASC";
+      }
+
+        await mysql.selectData(sql_string).then(result => {
           var entry;
 
           result.forEach(function(element)
@@ -1452,8 +1481,37 @@ app.get("/ForecastItemType", async function(req, res)
     var data = [];
     var table_string = "";
 
-      await mysql.selectData("SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
-        item_type_id + "' ORDER BY sales.Sale_Date ASC").then(result => {
+    var start_date = req.query.start_date;
+    var end_date = req.query.end_date;
+
+    var sql_string = "";
+
+    if (start_date != null)
+    {
+
+      if (end_date != null)
+      {
+        sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+          item_type_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) ORDER BY sales.Sale_Date ASC";
+      }
+      else
+      {
+        sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+          item_type_id + "' AND sales.Sale_Date >= CONVERT(" + start_date + ", date) AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+      }
+    }
+    else if (end_date != null)
+    {
+      sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+        item_type_id + "' AND sales.Sale_Date <= CONVERT(" + end_date + ", date) ORDER BY sales.Sale_Date ASC";
+    }
+    else
+    {
+      sql_string = "SELECT * FROM sales JOIN sales_items ON sales.Sale_ID = sales_items.Sale_ID JOIN item ON sales_items.Item_ID = item.Item_ID JOIN item_types ON item.itmType_ID = item_types.itmType_ID WHERE item.itmType_ID = '" +
+        item_type_id + "' ORDER BY sales.Sale_Date ASC";
+    }
+
+      await mysql.selectData(sql_string).then(result => {
         var entry;
 
         result.forEach(function(element)
